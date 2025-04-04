@@ -61,6 +61,10 @@ def draw_board():
             elif tile == 9:
                 pygame.draw.line(screen, 'white', (x - 0.5 * num2, y), (x + 0.5 * num2, y), 3)
 
+def draw_misc():
+    score_text = font.render(f"Score: {player.score}", True, 'white')
+    screen.blit(score_text, (405, 920))
+
 # Game loop
 while run:
     clock.tick(FPS)
@@ -77,11 +81,8 @@ while run:
 
     screen.fill('black')
     draw_board()
-    score_text = font.render(f"Score: {player.score}", True, 'white')
-    screen.blit(score_text, (10, 10))
-
     player.draw(screen)
-
+    draw_misc()
     turns_allowed = player.check_position(level)
     player.move(turns_allowed)
     score = player.check_collisions(level)
