@@ -7,13 +7,15 @@ pygame.init()
 # Constants
 WIDTH = 900
 HEIGHT = 950
-FPS = 60
+FPS = 80
 
 # Setup
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 pygame.display.set_caption("Pac-Man")
+font = pygame.font.Font('freesansbold.ttf', 20)
 clock = pygame.time.Clock()
 level = boards
+score = 0
 
 # Load ghost images
 ghost_imgs = {
@@ -70,15 +72,19 @@ while run:
     else:
         counter = 0
         flicker = True
-        
+
     player.counter = counter
 
     screen.fill('black')
     draw_board()
+    score_text = font.render(f"Score: {player.score}", True, 'white')
+    screen.blit(score_text, (10, 10))
+
     player.draw(screen)
 
     turns_allowed = player.check_position(level)
     player.move(turns_allowed)
+    score = player.check_collisions(level)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

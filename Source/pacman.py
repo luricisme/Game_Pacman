@@ -15,6 +15,7 @@ class Pacman:
         self.direction_command = -1
         self.counter = 0
         self.speed = 3
+        self.score = 0
 
     def draw(self, screen):
         if self.direction == 0:
@@ -85,3 +86,19 @@ class Pacman:
             turns[1] = True
 
         return turns
+
+    def check_collisions(self, level):
+        num1 = (950 - 50) // 32
+        num2 = 900 // 30
+        center_x = self.x + 22  # ~nửa kích thước Pac-Man (45/2)
+        center_y = self.y + 22
+
+        if 0 < center_x < 870:
+            row = center_y // num1
+            col = center_x // num2
+            if level[row][col] == 1:
+                level[row][col] = 0
+                self.score += 10
+            elif level[row][col] == 2:
+                level[row][col] = 0
+                self.score += 50
