@@ -16,6 +16,13 @@ font = pygame.font.Font('freesansbold.ttf', 20)
 clock = pygame.time.Clock()
 level = boards
 score = 0
+powerup = False
+power_counter = 0
+eaten_ghosts = [False, False, False, False]
+startup_counter = 0
+moving = True
+counter = 0
+lives = 3
 
 # Load ghost images
 ghost_imgs = {
@@ -64,6 +71,10 @@ def draw_board():
 def draw_misc():
     score_text = font.render(f"Score: {player.score}", True, 'white')
     screen.blit(score_text, (405, 920))
+    if powerup:
+        pygame.draw.circle(screen, 'blue', (140, 930), 15)
+    for i in range(lives):
+        screen.blit(pygame.transform.scale(player.images[0], (30, 30)), (650 + i * 40, 915))
 
 # Game loop
 while run:
@@ -76,6 +87,19 @@ while run:
     else:
         counter = 0
         flicker = True
+    
+    if player.powerup and player.power_counter < 600:
+        player.power_counter += 1
+    elif player.powerup and player.power_counter >= 600:
+        player.power_counter = 0
+        player.powerup = False
+        player.eaten_ghosts = [False, False, False, False]
+    
+    if startup_counter < 180:
+        moving = False
+        startup_counter += 1
+    else:
+        moving = True
 
     player.counter = counter
 
@@ -84,8 +108,9 @@ while run:
     player.draw(screen)
     draw_misc()
     turns_allowed = player.check_position(level)
-    player.move(turns_allowed)
-    score = player.check_collisions(level)
+    if moving:
+        player.move(turns_allowed)
+    player.score, player.powerup, player.power_counter, player.eaten_ghosts = player.check_collisions(level)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

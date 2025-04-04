@@ -16,6 +16,9 @@ class Pacman:
         self.counter = 0
         self.speed = 3
         self.score = 0
+        self.powerup = False
+        self.power_counter = 0
+        self.eaten_ghosts = [False, False, False, False]        
 
     def draw(self, screen):
         if self.direction == 0:
@@ -102,3 +105,9 @@ class Pacman:
             elif level[row][col] == 2:
                 level[row][col] = 0
                 self.score += 50
+                self.powerup = True
+                self.power_counter = 0
+                self.eaten_ghosts = [False, False, False, False]
+        return self.score, self.powerup, self.power_counter, self.eaten_ghosts
+        
+        
