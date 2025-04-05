@@ -1,6 +1,7 @@
 import pygame
 from ui import boards
 from pacman import Pacman
+from ghost import Ghost
 
 pygame.init()
 
@@ -23,16 +24,17 @@ startup_counter = 0
 moving = True
 counter = 0
 lives = 3
+ghost_speed = 2
 
-# Load ghost images
+# Load images
 ghost_imgs = {
-    "blinky": pygame.transform.scale(pygame.image.load('assets/ghosts/red.png'), (45, 45)),
-    "pinky": pygame.transform.scale(pygame.image.load('assets/ghosts/pink.png'), (45, 45)),
-    "inky": pygame.transform.scale(pygame.image.load('assets/ghosts/blue.png'), (45, 45)),
-    "clyde": pygame.transform.scale(pygame.image.load('assets/ghosts/orange.png'), (45, 45)),
-    "spooked": pygame.transform.scale(pygame.image.load('assets/ghosts/powerup.png'), (45, 45)),
-    "dead": pygame.transform.scale(pygame.image.load('assets/ghosts/dead.png'), (45, 45)),
+    "red_ghost": pygame.transform.scale(pygame.image.load('assets/ghosts/red.png'), (45, 45)),
+    "pink_ghost": pygame.transform.scale(pygame.image.load('assets/ghosts/pink.png'), (45, 45)),
+    "blue_ghost": pygame.transform.scale(pygame.image.load('assets/ghosts/blue.png'), (45, 45)),
+    "orange_ghost": pygame.transform.scale(pygame.image.load('assets/ghosts/orange.png'), (45, 45)),
 }
+spooked_img = pygame.transform.scale(pygame.image.load('assets/ghosts/powerup.png'), (45, 45))
+dead_img = pygame.transform.scale(pygame.image.load('assets/ghosts/dead.png'), (45, 45))
 
 # Game state
 player = Pacman(450, 663)
@@ -40,10 +42,18 @@ counter = 0
 flicker = False
 run = True
 
+targets = [(player.x, player.y), (player.x, player.y), (player.x, player.y), (player.x, player.y)]
+ghosts = [
+    Ghost(478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level, eaten_ghosts, powerup, spooked_img, dead_img),
+    Ghost(428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level, eaten_ghosts, powerup, spooked_img, dead_img),
+    Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level, eaten_ghosts, powerup, spooked_img, dead_img),
+    Ghost(378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level, eaten_ghosts, powerup, spooked_img, dead_img),
+]
+
 def draw_board():
     num1 = ((HEIGHT - 50) // 32)
     num2 = (WIDTH // 30)
-    color = 'blue'
+    color = 'darkmagenta'
     for i in range(len(level)):
         for j in range(len(level[i])):
             x = j * num2 + (0.5 * num2)
@@ -111,6 +121,12 @@ while run:
     if moving:
         player.move(turns_allowed)
     player.score, player.powerup, player.power_counter, player.eaten_ghosts = player.check_collisions(level)
+
+    for ghost in ghosts:
+        ghost.powerup = player.powerup
+        ghost.eaten_ghost = player.eaten_ghosts
+        ghost.draw()
+        # ghost.move_blue()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
