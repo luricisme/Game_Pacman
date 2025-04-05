@@ -1,8 +1,7 @@
 import pygame
 import math
+from ui import *
 
-WIDTH = 900
-HEIGHT = 950
 PI = math.pi
 
 class Pacman:
@@ -28,7 +27,10 @@ class Pacman:
             screen.blit(pygame.transform.rotate(self.images[self.counter // 5], 90), (self.x, self.y))
         elif self.direction == 3:
             screen.blit(pygame.transform.rotate(self.images[self.counter // 5], 270), (self.x, self.y))
-
+        else:
+            screen.blit(self.images[self.counter // 5], (self.x, self.y))
+            
+    
     def move(self, turns_allowed):
         if self.direction == 0 and turns_allowed[0]:
             self.x += self.speed
@@ -38,11 +40,14 @@ class Pacman:
             self.y -= self.speed
         elif self.direction == 3 and turns_allowed[3]:
             self.y += self.speed
+    
+    def get_position(self):
+        return ((self.y+TILE_HEIGHT//2)//TILE_HEIGHT, (self.x+TILE_HEIGHT//2)//TILE_WIDTH)
 
     def check_position(self, level):
         turns = [False, False, False, False]
-        num1 = (HEIGHT - 50) // 32
-        num2 = (WIDTH // 30)
+        num1 = TILE_HEIGHT
+        num2 = TILE_WIDTH
         num3 = 15
         centerx = self.x + 23
         centery = self.y + 24
@@ -90,8 +95,8 @@ class Pacman:
         return turns
 
     def check_collisions(self, level):
-        num1 = (950 - 50) // 32
-        num2 = 900 // 30
+        num1 = (HEIGHT - 50) // 32
+        num2 = WIDTH // 30
         center_x = self.x + 22  # ~nửa kích thước Pac-Man (45/2)
         center_y = self.y + 22
 
