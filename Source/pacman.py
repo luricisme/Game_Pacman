@@ -1,4 +1,3 @@
-# pacman.py
 import pygame
 import math
 
