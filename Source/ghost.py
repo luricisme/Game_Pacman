@@ -1,7 +1,11 @@
 import pygame
+from ui import *
+from levels.level01 import blue_ghost_path
+from levels.level02 import pink_ghost_path
 
 class Ghost:
-    def __init__(self, x_coord, y_coord, target, speed, img, direct, dead, box, id, screen, level, eaten_ghost, powerup, spooked_img, dead_img):
+    def __init__(self, x_coord, y_coord, target, speed, img, direct, dead, box, id, screen, level, eaten_ghost, powerup,
+                  spooked_img, dead_img):
         self.x_pos = x_coord
         self.y_pos = y_coord
         self.center_x = self.x_pos + 22
@@ -21,8 +25,7 @@ class Ghost:
         self.dead_img = dead_img
         self.turns, self.in_box = self.check_collisions()
         self.rect = self.draw()
-        self.prev_target = target
-        self.first_time = True
+        self.path = []
 
     def draw(self):
         if (not self.powerup and not self.dead) or (self.eaten_ghost[self.id] and self.powerup and not self.dead):
@@ -33,10 +36,13 @@ class Ghost:
             self.screen.blit(self.dead_img, (self.x_pos, self.y_pos))
         ghost_rect = pygame.rect.Rect((self.center_x - 18, self.center_y - 18), (36, 36))
         return ghost_rect
+    
+    def get_map_position(self):
+        return ((self.y_pos+TILE_HEIGHT//4)//TILE_HEIGHT, (self.x_pos+TILE_WIDTH//4)//TILE_WIDTH)
 
     def check_collisions(self):
-        num1 = ((950 - 50) // 32)
-        num2 = (900 // 30)
+        num1 = ((HEIGHT - 50) // 32)
+        num2 = (WIDTH // 30)
         num3 = 15
         self.turns = [False, False, False, False]
         level = self.level
@@ -105,10 +111,93 @@ class Ghost:
             self.in_box = False
         return self.turns, self.in_box
 
+    def move_to_node(self, node):        
+        node_x = node[1] * TILE_WIDTH - TILE_WIDTH // 4
+        node_y = node[0] * TILE_HEIGHT - TILE_HEIGHT // 4
+        # Di chuyển ghost đến vị trí của node
+        if self.x_pos < node_x:            
+            self.x_pos += self.speed
+            if self.x_pos > node_x:
+                self.x_pos = node_x
+        elif self.x_pos > node_x:
+            self.x_pos -= self.speed  
+            if self.x_pos < node_x:
+                self.x_pos = node_x      
+        if self.y_pos < node_y:
+            self.y_pos += self.speed
+            if self.y_pos > node_y:
+                self.y_pos = node_y
+        elif self.y_pos > node_y:
+            self.y_pos -= self.speed
+            if self.y_pos < node_y:
+                self.y_pos = node_y
+        return node_x == self.x_pos and node_y == self.y_pos
+
+    def move_to_box(self):
+        pass
     # def move_orange(self):
 
     # def move_red(self):
 
-    # def move_blue(self):
-
-    # def move_pink(self):
+    def move_blue(self, pacman_pos, graph):
+        ghost_pos = self.get_map_position()
+        if self.powerup:
+            #
+            return False
+        if self.dead and not self.in_box:
+            #self.move_to_box()
+            return     False   
+        # Nếu ghost đang ở trong box thì di chuyển ra ngoài box
+        if self.in_box and not self.dead:
+            if self.move_to_node((12, 14)):
+                self.in_box = False
+            self.path = []
+            return False
+        # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
+        if pacman_pos == ghost_pos and not self.powerup:
+            print("Pacman eaten")
+            self.path = []
+            return False
+        if self.path == [] or pacman_pos != self.path[-1]:
+            # Tìm path từ ghost đến pacman
+            self.path = blue_ghost_path(ghost_pos, pacman_pos, graph)
+        # Nếu không tìm thấy path thì ghost sẽ không di chuyển
+        if len(self.path) == 0:
+            return False
+        
+        if self.path != []:
+            if self.move_to_node(self.path[0]):
+                self.path.pop(0)
+            return True
+        return False
+    def move_pink(self, pacman_pos, graph):
+        ghost_pos = self.get_map_position()
+        if self.powerup:
+            self.path = []
+            return False
+        if self.dead and not self.in_box:
+            #self.move_to_box()
+            return False
+        # Nếu ghost đang ở trong box thì di chuyển ra ngoài box
+        if self.in_box and not self.dead:
+            if self.move_to_node((12, 14)):
+                self.in_box = False
+            self.path = []
+            return False
+        # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
+        if pacman_pos == ghost_pos and not self.powerup:
+            print("Pacman eaten")
+            self.path = []
+            return False
+        if self.path == [] or pacman_pos != self.path[-1]:
+            # Tìm path từ ghost đến pacman
+            self.path = pink_ghost_path(ghost_pos, pacman_pos, graph)
+        # Nếu không tìm thấy path thì ghost sẽ không di chuyển
+        if len(self.path) == 0:
+            return False
+        
+        if self.path != []:
+            if self.move_to_node(self.path[0]):
+                self.path.pop(0)
+            return True
+        return False
