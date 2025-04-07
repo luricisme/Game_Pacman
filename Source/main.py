@@ -1,5 +1,7 @@
 import pygame
 import sys
+
+from levels.level03 import convert_to_maze_with_points
 from ui import boards, board_only_ghost
 from pacman import Pacman
 from ghost import Ghost
@@ -133,6 +135,8 @@ def run_game(level):
     player = None
     if level == 6:
         player = Pacman(450, 663)  # Chỉ tạo pacman cho level 6
+    elif level == 3:
+        player = Pacman(450, 663)
     
     counter = 0
     flicker = False
@@ -261,7 +265,9 @@ def run_game(level):
             if moving:
                 player.move(turns_allowed)
             player.score, player.powerup, player.power_counter, player.eaten_ghosts = player.check_collisions(level_data)
-    
+        elif level == 3 and player:
+            player.draw(screen)
+
         for ghost in ghosts:
             if level == 6 and player:
                 ghost.powerup = player.powerup
@@ -277,6 +283,18 @@ def run_game(level):
             elif ghost.id == 2:  # Blue ghost
                 pass  # ghost.move_blue()
             elif ghost.id == 3:  # Orange ghost
+                print(ghost.target[1] // 32)
+                print(ghost.target[0] // 30)
+                print(player.x // 30)
+                print(player.y // 30)
+                # ghost_index_in_level = ghost.level[ghost.y_pos // 32][ghost.x_pos // 30]
+                # target_index_in_level = ghost.level[ghost.target[1] // 32][ghost.target[0] // 30]
+                maze = convert_to_maze_with_points(ghost.level, (ghost.x_pos // 30, ghost.y_pos // 30), (ghost.target[0] // 30, ghost.target[1] // 30))
+                with open('maze.txt', 'w') as f:
+                    for row in maze:
+                        f.write(row + '\n')
+                while True:
+                    pass
                 pass  # ghost.move_orange()
     
         for event in pygame.event.get():

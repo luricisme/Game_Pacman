@@ -21,6 +21,8 @@ class Ghost:
         self.dead_img = dead_img
         self.turns, self.in_box = self.check_collisions()
         self.rect = self.draw()
+        self.prev_target = target
+        self.first_time = True
 
     def draw(self):
         if (not self.powerup and not self.dead) or (self.eaten_ghost[self.id] and self.powerup and not self.dead):
