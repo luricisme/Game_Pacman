@@ -51,7 +51,8 @@ def pink_ghost_path(ghost_pos, pacman_pos, graph):
     #  Record search time, memory usage, and number of expanded nodes 
     # print("graph", graph)   
     result = dfs(graph, ghost_pos, pacman_pos)
-    if result:        
+    if result:
+        print(f"Pink ghost path found:")
         print("Path found:", result['path'])
         print("Nodes expanded:", result['nodes_expanded'])
         print("Time (ms):", round(result['time_ms'], 5))
