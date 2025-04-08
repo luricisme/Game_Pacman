@@ -135,9 +135,110 @@ class Ghost:
 
     def move_to_box(self):
         pass
-    # def move_orange(self):
 
-    # def move_red(self):
+    def move_orange(self, pacman_pos, graph):
+        ghost_pos = self.get_map_position()
+
+        # Nếu ghost đã chết và không ở trong box thì không di chuyển
+        if self.dead and not self.in_box:
+            return False
+
+        # Nếu ghost đang ở trong box thì di chuyển ra ngoài box
+        if self.in_box and not self.dead:
+            if self.move_to_node((12, 14)):
+                self.in_box = False
+            self.path = []
+            return False
+
+        # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
+        if pacman_pos == ghost_pos and not self.powerup:
+            print("Pacman eaten")
+            self.path = []
+            return False
+
+        if self.powerup:
+            # Tính toán đường đi mới khi cần
+            if self.path == [] or self.target != pacman_pos:
+                self.target = pacman_pos  # Lưu vị trí pacman hiện tại
+                from levels.level03 import escape_path_for_powerup
+                self.path = escape_path_for_powerup(ghost_pos, pacman_pos, graph)
+                print("Orange ghost escaping from powered-up Pacman!")
+
+            # Di chuyển theo đường đi đã tính toán
+            if len(self.path) > 0:
+                if self.move_to_node(self.path[0]):
+                    self.path.pop(0)
+                return True
+            return False
+
+        # Tính toán đường đi mới khi cần
+        if self.path == [] or pacman_pos != self.path[-1]:
+            # Tìm path từ ghost đến pacman
+            from levels.level03 import orange_ghost_path
+            self.path = orange_ghost_path(ghost_pos, pacman_pos, graph)
+
+        # Nếu không tìm thấy path thì ghost sẽ không di chuyển
+        if len(self.path) == 0:
+            return False
+
+        # Di chuyển theo đường đi đã tính toán
+        if self.path != []:
+            if self.move_to_node(self.path[0]):
+                self.path.pop(0)
+            return True
+        return False
+
+    def move_red(self, pacman_pos, graph):
+        ghost_pos = self.get_map_position()
+
+        # Nếu ghost đã chết và không ở trong box thì không di chuyển
+        if self.dead and not self.in_box:
+            return False
+
+        # Nếu ghost đang ở trong box thì di chuyển ra ngoài box
+        if self.in_box and not self.dead:
+            if self.move_to_node((12, 14)):
+                self.in_box = False
+            self.path = []
+            return False
+
+        # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
+        if pacman_pos == ghost_pos and not self.powerup:
+            print("Pacman eaten")
+            self.path = []
+            return False
+
+        if self.powerup:
+            # Tính toán đường đi mới khi cần
+            if self.path == [] or self.target != pacman_pos:
+                self.target = pacman_pos  # Lưu vị trí pacman hiện tại
+                from levels.level04 import escape_path_for_powerup
+                self.path = escape_path_for_powerup(ghost_pos, pacman_pos, graph)
+                print("Red ghost escaping from powered-up Pacman!")
+
+            # Di chuyển theo đường đi đã tính toán
+            if len(self.path) > 0:
+                if self.move_to_node(self.path[0]):
+                    self.path.pop(0)
+                return True
+            return False
+
+        # Tính toán đường đi mới khi cần
+        if self.path == [] or pacman_pos != self.path[-1]:
+            # Tìm path từ ghost đến pacman
+            from levels.level04 import red_ghost_path
+            self.path = red_ghost_path(ghost_pos, pacman_pos, graph)
+
+        # Nếu không tìm thấy path thì ghost sẽ không di chuyển
+        if len(self.path) == 0:
+            return False
+
+        # Di chuyển theo đường đi đã tính toán
+        if self.path != []:
+            if self.move_to_node(self.path[0]):
+                self.path.pop(0)
+            return True
+        return False
 
     def move_blue(self, pacman_pos, graph):
         ghost_pos = self.get_map_position()

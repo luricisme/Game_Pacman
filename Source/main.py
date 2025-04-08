@@ -264,6 +264,43 @@ def run_game(level):
                 else:
                     continue
 
+        if level == 3:
+            # pacman đứng yên và orange ghost di chuyển
+            if player:
+                player.x = int((player_pos[0][1] - 0.5) * TILE_WIDTH)
+                player.y = int((player_pos[0][0] - 0.5) * TILE_HEIGHT)
+                player.check_position(level_data)
+                player.move([False, False, False, False])
+                player.draw(screen)
+            # Xử lý ma di chuyển
+            for ghost in ghosts:
+                ghost.powerup = False
+                ghost.eaten_ghost = [False, False, False, False]
+                ghost.draw()
+                if ghost.move_orange(player.get_position(), graph=graph):
+                    ghost.draw()
+                    ghost.check_collisions()
+                else:
+                    continue
+
+        if level == 4:
+            # pacman đứng yên và red ghost di chuyển
+            if player:
+                player.x = int((player_pos[0][1] - 0.5) * TILE_WIDTH)
+                player.y = int((player_pos[0][0] - 0.5) * TILE_HEIGHT)
+                player.check_position(level_data)
+                player.move([False, False, False, False])
+                player.draw(screen)
+            # Xử lý ma di chuyển
+            for ghost in ghosts:
+                ghost.powerup = False
+                ghost.eaten_ghost = [False, False, False, False]
+                ghost.draw()
+                if ghost.move_red(player.get_position(), graph=graph):
+                    ghost.draw()
+                    ghost.check_collisions()
+                else:
+                    continue
 
         # Xử lý pacman và powerup chỉ khi level 6
         if level == 6 and player:
@@ -299,7 +336,11 @@ def run_game(level):
             if moving:
                 player.move(turns_allowed)
             player.score, player.powerup, player.power_counter, player.eaten_ghosts = player.check_collisions(level_data)
-    
+        elif level == 3 and player:
+            player.draw(screen)
+        elif level == 4 and player:
+            player.draw(screen)
+
         for ghost in ghosts:
             if level == 6 and player:
                 ghost.powerup = player.powerup
@@ -309,14 +350,14 @@ def run_game(level):
             
             # Thêm logic di chuyển ma tương ứng với từng loại ma
             if ghost.id == 0:  # Red ghost
-                pass  # ghost.move_red()
+                ghost.move_red(player.get_position(), graph=graph)
             elif ghost.id == 1:  # Pink ghost
                 ghost.move_pink(player.get_position(), graph=graph)
             elif ghost.id == 2:  # Blue ghost
                 ghost.move_blue(player.get_position(), graph=graph)
             elif ghost.id == 3:  # Orange ghost
-                pass  # ghost.move_orange()
-    
+                ghost.move_orange(player.get_position(), graph=graph)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 # run = False
