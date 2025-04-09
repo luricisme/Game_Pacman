@@ -46,6 +46,7 @@ def blue_ghost_path(ghost_pos, pacman_pos, graph):
     #  Record search time, memory usage, and number of expanded nodes    
     result = BFS(ghost_pos, pacman_pos, graph)
     if result:
+        print(f"Blue ghost path found:")
         print("Path found:", result['path'])
         print("Nodes expanded:", result['nodes_expanded'])
         print("Time (ms):", round(result['time_ms'], 3))

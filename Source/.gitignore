@@ -1,0 +1,144 @@
+# ===== Hệ điều hành =====
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+__MACOSX/
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+*~
+
+# ===== IDE & Editor =====
+# VSCode
+.vscode/
+
+# JetBrains (WebStorm, IntelliJ, PyCharm, etc.)
+.idea/
+*.iml
+
+# Eclipse
+.project
+.classpath
+.cproject
+.settings/
+
+# NetBeans
+/nbproject/private/
+/build/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# ===== Node.js =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+.env
+.venv/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ===== Java =====
+*.class
+*.jar
+*.war
+*.ear
+*.log
+*.jks
+*.ser
+*.iml
+*.ipr
+*.iws
+target/
+out/
+
+# ===== Dotenv & môi trường =====
+.env
+.env.*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ===== Logs =====
+*.log
+logs/
+*.pid
+*.seed
+*.pid.lock
+
+# ===== Database =====
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+*.sql
+*.bak
+
+# ===== Test & Coverage =====
+coverage/
+*.lcov
+.nyc_output/
+test-results/
+junit.xml
+
+# ===== Build files =====
+dist/
+build/
+tmp/
+temp/
+.cache/
+*.tmp
+
+# ===== Misc =====
+*.swp
+*.swo
+*.bak
+*.old
+*.orig
+*.rej
+*.sublime-*
+*.log.*
+
+# Backup files
+*.bak
+*.tmp
+*.orig
+*.save
+
+# ===== Docker =====
+*.pid
+*.seed
+*.pid.lock
+docker-compose.override
