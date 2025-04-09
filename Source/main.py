@@ -15,7 +15,8 @@ clock = pygame.time.Clock()
 
 # Font chữ
 title_font = pygame.font.Font('freesansbold.ttf', 70)
-menu_font = pygame.font.Font('freesansbold.ttf', 40)
+title_font_sm = pygame.font.Font('freesansbold.ttf', 50)
+menu_font = pygame.font.Font('freesansbold.ttf', 30)
 instruction_font = pygame.font.Font('freesansbold.ttf', 35)
 score_font = pygame.font.Font('freesansbold.ttf', 25)
 backmenu_font = pygame.font.Font('freesansbold.ttf', 18)
@@ -38,49 +39,112 @@ def draw_text(text, font, color, surface, x, y):
     text_rect.center = (x, y)
     surface.blit(text_obj, text_rect)
 
+
+def draw_diamonds_fadeout(surface, x, y, sz):
+    # Blinking diamond effect
+    size = sz
+    time_now = pygame.time.get_ticks()
+
+    # Tạo độ mờ dao động theo thời gian (dạng sin hoặc tam giác)
+    # Fade chu kỳ 1000ms (1s)
+    alpha = abs(255 * ((time_now % 1000) - 500) / 500)
+    alpha = int(alpha)
+
+    # Tạo surface riêng có hỗ trợ alpha
+    diamond_surf = pygame.Surface((size * 2 + 2, size * 2 + 2), pygame.SRCALPHA)
+    diamond_color = (*LIGHT_PURPLE, alpha)  # RGB + alpha
+
+    points = [
+        (size + 1, 1),               # Top
+        (size * 2 + 1, size + 1),    # Right
+        (size + 1, size * 2 + 1),    # Bottom
+        (1, size + 1)                # Left
+    ]
+
+    pygame.draw.polygon(diamond_surf, diamond_color, points)
+    surface.blit(diamond_surf, (x - size, y - size))
+
+
+
+def draw_diamonds_changecolor(surface, x, y, sz):
+    # Blinking diamond effect
+    size = sz
+    time_now = pygame.time.get_ticks()
+
+    # Mỗi 500ms thì đổi màu
+    if (time_now // 500) % 2 == 0:
+        diamond_color = LIGHT_PURPLE
+    else:
+        diamond_color = WHITE  # Hoặc BLACK, hoặc một màu gì nổi hơn
+
+    points = [
+        (x, y - size),     # Top
+        (x + size, y),     # Right
+        (x, y + size),     # Bottom
+        (x - size, y)      # Left
+    ]
+
+    pygame.draw.polygon(surface, diamond_color, points)
+
+
 def main_menu():
     """Màn hình menu chính"""
     while True:
-        screen.fill(BLACK)
+        screen.fill(DARK_PURPLE)
+        draw_diamonds_changecolor(screen, 590, 255, 4)
+        draw_diamonds_fadeout(screen, 300, 230, 5)
+        draw_diamonds_changecolor(screen, 100, 200, 10)
+        draw_diamonds_changecolor(screen, 770, 40, 11)
+        draw_diamonds_changecolor(screen, 140, 450, 7)
+        draw_diamonds_changecolor(screen, 100, 200, 10)
+        draw_diamonds_fadeout(screen, 830, 150, 6)
+        draw_diamonds_changecolor(screen, 750, 820, 10)
+        draw_diamonds_fadeout(screen, 50, 80, 5)
+        draw_diamonds_changecolor(screen, 100, 850, 11)
+        draw_diamonds_fadeout(screen, 290, 890, 4)
+        draw_diamonds_fadeout(screen, 850, 900, 7)
+        draw_diamonds_changecolor(screen, 855, 500, 9)
+        draw_diamonds_fadeout(screen, 720, 600, 4)
+        draw_diamonds_fadeout(screen, 180, 710, 4)
         
         # Vẽ tiêu đề
-        draw_text('PAC-MAN', title_font, YELLOW, screen, WIDTH//2, 150)
-        
-        # Vẽ hướng dẫn
-        draw_text('MENU', instruction_font, WHITE, screen, WIDTH//2, 250)
+        draw_text('PACMAN GAME', title_font, PURPLE, screen, WIDTH//2, 100)
+        draw_text('GROUP 3', title_font_sm, LIGHT_PURPLE, screen, WIDTH//2, 190)
         
         # Vẽ các lựa chọn level
         level_buttons = []
+        base_y = 300
+        gap = 85
         
         # Level 1 - Blue Ghost
-        pygame.draw.rect(screen, BLUE, [WIDTH//2 - 225, 320, 450, 70], 0, 10)
-        draw_text('Level 1 - Blue Ghost', menu_font, WHITE, screen, WIDTH//2, 355)
-        level_buttons.append(pygame.Rect(WIDTH//2 - 200, 320, 400, 70))
-        
+        pygame.draw.rect(screen, BLUE, [WIDTH//2 - 200, base_y, 400, 55], 0, 10)
+        draw_text('Level 1 - Blue Ghost', menu_font, DARK_BLUE, screen, WIDTH//2, base_y + 30)
+        level_buttons.append(pygame.Rect(WIDTH//2 - 200, base_y, 400, 55))
+
         # Level 2 - Pink Ghost
-        pygame.draw.rect(screen, PINK, [WIDTH//2 - 225, 420, 450, 70], 0, 10)
-        draw_text('Level 2 - Pink Ghost', menu_font, BLACK, screen, WIDTH//2, 455)
-        level_buttons.append(pygame.Rect(WIDTH//2 - 200, 420, 400, 70))
-        
+        pygame.draw.rect(screen, PINK, [WIDTH//2 - 200, base_y + gap, 400, 55], 0, 10)
+        draw_text('Level 2 - Pink Ghost', menu_font, DARK_PINK, screen, WIDTH//2, base_y + gap + 30)
+        level_buttons.append(pygame.Rect(WIDTH//2 - 200, base_y + gap, 400, 55))
+
         # Level 3 - Orange Ghost
-        pygame.draw.rect(screen, ORANGE, [WIDTH//2 - 250, 520, 500, 70], 0, 10)
-        draw_text('Level 3 - Orange Ghost', menu_font, BLACK, screen, WIDTH//2, 555)
-        level_buttons.append(pygame.Rect(WIDTH//2 - 200, 520, 400, 70))
-        
+        pygame.draw.rect(screen, ORANGE, [WIDTH//2 - 225, base_y + 2 * gap, 450, 55], 0, 10)
+        draw_text('Level 3 - Orange Ghost', menu_font, BROWN, screen, WIDTH//2, base_y + 2 * gap + 30)
+        level_buttons.append(pygame.Rect(WIDTH//2 - 200, base_y + 2 * gap, 400, 55))
+
         # Level 4 - Red Ghost
-        pygame.draw.rect(screen, RED, [WIDTH//2 - 225, 620, 450, 70], 0, 10)
-        draw_text('Level 4 - Red Ghost', menu_font, WHITE, screen, WIDTH//2, 655)
-        level_buttons.append(pygame.Rect(WIDTH//2 - 200, 620, 400, 70))
-        
+        pygame.draw.rect(screen, RED, [WIDTH//2 - 200, base_y + 3 * gap, 400, 55], 0, 10)
+        draw_text('Level 4 - Red Ghost', menu_font, LIGHT_RED, screen, WIDTH//2, base_y + 3 * gap + 30)
+        level_buttons.append(pygame.Rect(WIDTH//2 - 200, base_y + 3 * gap, 400, 55))
+
         # Level 5 - All Ghosts
-        pygame.draw.rect(screen, WHITE, [WIDTH//2 - 225, 720, 450, 70], 0, 10)
-        draw_text('Level 5 - All Ghosts', menu_font, BLACK, screen, WIDTH//2, 755)
-        level_buttons.append(pygame.Rect(WIDTH//2 - 200, 720, 400, 70))
+        pygame.draw.rect(screen, WHITE, [WIDTH//2 - 200, base_y + 4 * gap, 400, 55], 0, 10)
+        draw_text('Level 5 - All Ghosts', menu_font, BLACK, screen, WIDTH//2, base_y + 4 * gap + 30)
+        level_buttons.append(pygame.Rect(WIDTH//2 - 200, base_y + 4 * gap, 400, 55))
 
         # Level 6 - Pacman Mode
-        pygame.draw.rect(screen, YELLOW, [WIDTH//2 - 250, 820, 500, 70], 0, 10)
-        draw_text('Level 6 - Pacman Mode', menu_font, BLACK, screen, WIDTH//2, 855)
-        level_buttons.append(pygame.Rect(WIDTH//2 - 200, 820, 400, 70))
+        pygame.draw.rect(screen, TEAL, [WIDTH//2 - 225, base_y + 5 * gap, 450, 55], 0, 10)
+        draw_text('Level 6 - Pacman Mode', menu_font, DARK_TEAL, screen, WIDTH//2, base_y + 5 * gap + 30)
+        level_buttons.append(pygame.Rect(WIDTH//2 - 200, base_y + 5 * gap, 400, 55))
         
         # Xử lý sự kiện
         for event in pygame.event.get():
@@ -336,6 +400,10 @@ def run_game(level):
             if moving:
                 player.move(turns_allowed)
             player.score, player.powerup, player.power_counter, player.eaten_ghosts = player.check_collisions(level_data)
+        elif level == 1 and player:
+            player.draw(screen)
+        elif level == 2 and player:
+            player.draw(screen)
         elif level == 3 and player:
             player.draw(screen)
         elif level == 4 and player:
