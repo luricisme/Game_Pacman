@@ -6,7 +6,7 @@ PI = math.pi
 
 class Pacman:
     def __init__(self, x, y):
-        self.images = [pygame.transform.scale(pygame.image.load(f'assets/pacman/{i}.png'), (45, 45)) for i in range(1, 5)]
+        self.images = [pygame.transform.scale(pygame.image.load(f'Source/assets/pacman/{i}.png'), (45, 45)) for i in range(1, 5)]
         self.x = x
         self.y = y
         self.direction = 0

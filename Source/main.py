@@ -22,14 +22,14 @@ backmenu_font = pygame.font.Font('freesansbold.ttf', 18)
 
 # Tải hình ảnh
 ghost_imgs = {
-    "red_ghost": pygame.transform.scale(pygame.image.load('assets/ghosts/red.png'), (45, 45)),
-    "pink_ghost": pygame.transform.scale(pygame.image.load('assets/ghosts/pink.png'), (45, 45)),
-    "blue_ghost": pygame.transform.scale(pygame.image.load('assets/ghosts/blue.png'), (45, 45)),
-    "orange_ghost": pygame.transform.scale(pygame.image.load('assets/ghosts/orange.png'), (45, 45)),
+    "red_ghost": pygame.transform.scale(pygame.image.load('Source/assets/ghosts/red.png'), (45, 45)),
+    "pink_ghost": pygame.transform.scale(pygame.image.load('Source/assets/ghosts/pink.png'), (45, 45)),
+    "blue_ghost": pygame.transform.scale(pygame.image.load('Source/assets/ghosts/blue.png'), (45, 45)),
+    "orange_ghost": pygame.transform.scale(pygame.image.load('Source/assets/ghosts/orange.png'), (45, 45)),
 }
-spooked_img = pygame.transform.scale(pygame.image.load('assets/ghosts/powerup.png'), (45, 45))
-dead_img = pygame.transform.scale(pygame.image.load('assets/ghosts/dead.png'), (45, 45))
-pacman_img = pygame.transform.scale(pygame.image.load('assets/pacman/1.png'), (45, 45))
+spooked_img = pygame.transform.scale(pygame.image.load('Source/assets/ghosts/powerup.png'), (45, 45))
+dead_img = pygame.transform.scale(pygame.image.load('Source/assets/ghosts/dead.png'), (45, 45))
+pacman_img = pygame.transform.scale(pygame.image.load('Source/assets/pacman/1.png'), (45, 45))
 
 def draw_text(text, font, color, surface, x, y):
     """Vẽ text lên màn hình tại tọa độ x, y"""
