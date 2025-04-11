@@ -166,13 +166,6 @@ def run_game(level):
     else:
         level_data = board_only_ghost
 
-    score = 0
-    powerup = False
-    power_counter = 0
-    eaten_ghosts = [False, False, False, False]
-    startup_counter = 0
-    moving = True
-    counter = 0
     lives = 3
     ghost_speed = 2
     graph = extract_graph(level_data)
@@ -181,7 +174,6 @@ def run_game(level):
     # player = None
     # (800, 50), (450, 663), (800, 800), (200, 300), (50, 800)
     player = Pacman(50, 800) 
-    flicker = False
     run = True
     
     # Mảng chứa ghosts
@@ -193,36 +185,35 @@ def run_game(level):
     if level == 1:  
         print("---------------\nLevel 1")
         # Blue Ghost
-        ghosts.append(Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img))
+        ghosts.append(Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
     elif level == 2:  
         print("---------------\nLevel 2")
         # Pink Ghost
-        ghosts.append(Ghost(428, 386, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img))
+        ghosts.append(Ghost(428, 386, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
     elif level == 3:  
         print("---------------\nLevel 3")
         # Orange Ghost
-        ghosts.append(Ghost(428, 386, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img))
+        ghosts.append(Ghost(428, 386, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
     elif level == 4:  
         print("---------------\nLevel 4")
         # Red Ghost
-        ghosts.append(Ghost(428, 386, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img))
+        ghosts.append(Ghost(428, 386, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
     elif level == 5:  # All Ghosts
         print("---------------\nLevel 5")
         ghosts = [
-            Ghost(478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost(428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost(378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost(478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost(428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost(378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
         ]
     elif level == 6:  # Pacman Mode (Pacman tránh ma)
         print("---------------\nLevel 6")
         ghosts = [
-            Ghost(478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img),
-            Ghost(428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img),
-            Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img),
-            Ghost(378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img),
+            Ghost(478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=60),
+            Ghost(428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=60),
+            Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=60),
+            Ghost(378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=60),
         ]
-        # Có thể thêm logic đặc biệt cho level 6 ở đây
     
     def draw_board():
         num1 = TILE_HEIGHT
@@ -235,7 +226,7 @@ def run_game(level):
                 tile = level_data[i][j]
                 if tile == 1:
                     pygame.draw.circle(screen, 'white', (x, y), 4)
-                elif tile == 2 and not flicker:
+                elif tile == 2 and not player.flicker:
                     pygame.draw.circle(screen, 'white', (x, y), 10)
                 elif tile == 3:
                     pygame.draw.line(screen, color, (x, y - 0.5 * num1), (x, y + 0.5 * num1), 3)
@@ -265,7 +256,7 @@ def run_game(level):
         screen.blit(score_text, (30, 920))
         screen.blit(level_text, (300, 920))
         
-        if powerup:
+        if player.powerup:
             pygame.draw.circle(screen, 'blue', (550, 930), 15)
         
         # Hiển thị số mạng
@@ -276,22 +267,13 @@ def run_game(level):
     while run:
         clock.tick(FPS)
 
-        if counter < 19:
-            counter += 1
-            if counter > 3:
-                flicker = False
+        if player.counter < 19:
+            player.counter += 1
+            if player.counter > 2:
+                player.flicker = False
         else:
-            counter = 0
-            flicker = True
-        
-        if startup_counter < 180:
-            moving = False
-            startup_counter += 1
-        else:
-            moving = True
-
-        if level == 6 and player:
-            player.counter = counter
+            player.counter = 0
+            player.flicker = True
         
         screen.fill('black')
         draw_board()
@@ -316,39 +298,54 @@ def run_game(level):
             elif ghost.id == 3:  # Orange ghost
                 ghost.move_orange(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
 
+        if level == 6:
+            # print("LEVEL 06 LOGIC CODE")
+            if player.powerup and player.power_counter < 600:
+                player.power_counter += 1
+            elif player.powerup and player.power_counter >= 600:
+                player.power_counter = 0
+                player.powerup = False
+                player.eaten_ghost = [False, False, False, False, False]
+            
+            if player.startup_counter < 180:
+                player.moving = False
+                player.startup_counter += 1
+            else:
+                player.moving = True
+
+            player.turns_allowed = player.check_position(level_data)
+            if player.moving:
+                player.move()
+            player.check_collisions(level_data)
+            draw_misc()
+
+            key_press = pygame.key.get_pressed()
+            if key_press[pygame.K_RIGHT]:
+                player.direction_command = 0
+            elif key_press[pygame.K_LEFT]:
+                player.direction_command = 1
+            if key_press[pygame.K_UP]:
+                player.direction_command = 2
+            elif key_press[pygame.K_DOWN]:
+                player.direction_command = 3
+
+            if player.x > 900:
+                player.x = -47
+            elif player.x < -50:
+                player.x = 897
+
+            for i in range(4):
+                if player.direction_command == i and player.turns_allowed[i]:
+                    player.direction = i
+
         if not player.isLive:
             run = False
             continue
-
-        if level == 6 and player:
-            print("TEST")
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                # run = False
                 pygame.quit()
                 sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
-                    player.direction = 0
-                elif event.key == pygame.K_LEFT:
-                    player.direction = 1
-                elif event.key == pygame.K_UP:
-                    player.direction = 2
-                elif event.key == pygame.K_DOWN:
-                    player.direction = 3
-                elif event.key == pygame.K_ESCAPE:
-                    return
-            
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_RIGHT and player.direction_command == 0:
-                    player.direction_command = player.direction
-                elif event.key == pygame.K_LEFT and player.direction_command == 1:
-                    player.direction_command = player.direction
-                elif event.key == pygame.K_UP and player.direction_command == 2:
-                    player.direction_command = player.direction
-                elif event.key == pygame.K_DOWN and player.direction_command == 3:
-                    player.direction_command = player.direction
     
         pygame.display.flip()
 
