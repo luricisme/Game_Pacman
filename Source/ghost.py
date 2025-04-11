@@ -247,7 +247,7 @@ class Ghost:
             return False
         if self.dead and not self.in_box:
             #self.move_to_box()
-            return     False   
+            return False   
         # Nếu ghost đang ở trong box thì di chuyển ra ngoài box
         if self.in_box and not self.dead:
             if self.move_to_node((12, 14)):
@@ -271,6 +271,7 @@ class Ghost:
                 self.path.pop(0)
             return True
         return False
+    
     def move_pink(self, pacman_pos, graph):
         ghost_pos = self.get_map_position()
         if self.powerup:
