@@ -4,6 +4,7 @@ from ui import *
 from pacman import Pacman
 from ghost import Ghost
 from read_map import *
+
 # Khởi tạo pygame
 pygame.init()
 # 5 Vị trí bắt đầu của Pacman
@@ -179,7 +180,6 @@ def run_game(level):
     # Game state
     # player = None
     player = Pacman(200, 200) 
-    counter = 0
     flicker = False
     run = True
     
@@ -208,10 +208,10 @@ def run_game(level):
     elif level == 5:  # All Ghosts
         print("---------------\nLevel 5")
         ghosts = [
-            Ghost(478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img),
-            Ghost(428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img),
-            Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img),
-            Ghost(378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img),
+            # Ghost(478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img),
+            Ghost(428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img, spawn_delay=60),
+            Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img, spawn_delay=0),
+            # Ghost(378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, eaten_ghosts, powerup, spooked_img, dead_img),
         ]
     elif level == 6:  # Pacman Mode (Pacman tránh ma)
         print("---------------\nLevel 6")
@@ -302,45 +302,53 @@ def run_game(level):
         # Hiện lên ghost tương ứng với từng level
         for ghost in ghosts:
             ghost.draw()
+
+            # Lấy vị trí của các con ghost khác
+            other_ghost_positions = [g.get_map_position() for g in ghosts if g != ghost]
             # Thêm logic di chuyển ma tương ứng với từng loại ma
             if ghost.id == 0:  # Red ghost
                 ghost.move_red(player.get_position(), graph=graph)
             elif ghost.id == 1:  # Pink ghost
-                ghost.move_pink(player.get_position(), graph=graph)
+                ghost.move_pink(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
             elif ghost.id == 2:  # Blue ghost
-                ghost.move_blue(player.get_position(), graph=graph)
+                ghost.move_blue(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
             elif ghost.id == 3:  # Orange ghost
                 ghost.move_orange(player.get_position(), graph=graph)
 
+        if not player.isLive:
+            run = False
+            continue
+
         if level == 6 and player:
             print("TEST")
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    # run = False
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RIGHT:
+                        player.direction = 0
+                    elif event.key == pygame.K_LEFT:
+                        player.direction = 1
+                    elif event.key == pygame.K_UP:
+                        player.direction = 2
+                    elif event.key == pygame.K_DOWN:
+                        player.direction = 3
+                    elif event.key == pygame.K_ESCAPE:
+                        return
+                
+                elif event.type == pygame.KEYUP:
+                    if event.key == pygame.K_RIGHT and player.direction_command == 0:
+                        player.direction_command = player.direction
+                    elif event.key == pygame.K_LEFT and player.direction_command == 1:
+                        player.direction_command = player.direction
+                    elif event.key == pygame.K_UP and player.direction_command == 2:
+                        player.direction_command = player.direction
+                    elif event.key == pygame.K_DOWN and player.direction_command == 3:
+                        player.direction_command = player.direction
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                # run = False
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
-                    player.direction = 0
-                elif event.key == pygame.K_LEFT:
-                    player.direction = 1
-                elif event.key == pygame.K_UP:
-                    player.direction = 2
-                elif event.key == pygame.K_DOWN:
-                    player.direction = 3
-                elif event.key == pygame.K_ESCAPE:
-                    return
-            
-            elif event.type == pygame.KEYUP:
-                if event.key == pygame.K_RIGHT and player.direction_command == 0:
-                    player.direction_command = player.direction
-                elif event.key == pygame.K_LEFT and player.direction_command == 1:
-                    player.direction_command = player.direction
-                elif event.key == pygame.K_UP and player.direction_command == 2:
-                    player.direction_command = player.direction
-                elif event.key == pygame.K_DOWN and player.direction_command == 3:
-                    player.direction_command = player.direction
+        
     
         pygame.display.flip()
 

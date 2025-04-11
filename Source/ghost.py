@@ -5,7 +5,7 @@ from levels.level02 import pink_ghost_path
 
 class Ghost:
     def __init__(self, x_coord, y_coord, target, speed, img, direct, dead, box, id, screen, level, eaten_ghost, powerup,
-                  spooked_img, dead_img):
+                  spooked_img, dead_img, spawn_delay=0):
         self.x_pos = x_coord
         self.y_pos = y_coord
         self.center_x = self.x_pos + 22
@@ -25,6 +25,8 @@ class Ghost:
         self.dead_img = dead_img
         self.turns, self.in_box = self.check_collisions()
         self.rect = self.draw()
+        self.spawn_delay = spawn_delay
+        self.delay_counter = 0
         self.path = []
 
     def draw(self):
@@ -240,7 +242,12 @@ class Ghost:
             return True
         return False
 
-    def move_blue(self, pacman_pos, graph):
+    def move_blue(self, pacman_pos, graph, other_ghost_positions, player):
+         # Delay khi spawn
+        if self.delay_counter < self.spawn_delay:
+            self.delay_counter += 1
+            return False
+        
         ghost_pos = self.get_map_position()
         if self.powerup:
             #
@@ -257,11 +264,12 @@ class Ghost:
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
         if pacman_pos == ghost_pos and not self.powerup:
             print("Pacman eaten")
+            player.isLive = False
             self.path = []
             return False
         if self.path == [] or pacman_pos != self.path[-1]:
             # Tìm path từ ghost đến pacman
-            self.path = blue_ghost_path(ghost_pos, pacman_pos, graph)
+            self.path = blue_ghost_path(ghost_pos, pacman_pos, graph, other_ghost_positions)
         # Nếu không tìm thấy path thì ghost sẽ không di chuyển
         if len(self.path) == 0:
             return False
@@ -272,7 +280,12 @@ class Ghost:
             return True
         return False
     
-    def move_pink(self, pacman_pos, graph):
+    def move_pink(self, pacman_pos, graph, other_ghost_positions, player):
+         # Delay khi spawn
+        if self.delay_counter < self.spawn_delay:
+            self.delay_counter += 1
+            return False
+        
         ghost_pos = self.get_map_position()
         if self.powerup:
             self.path = []
@@ -289,11 +302,12 @@ class Ghost:
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
         if pacman_pos == ghost_pos and not self.powerup:
             print("Pacman eaten")
+            player.isLive = False
             self.path = []
             return False
         if self.path == [] or pacman_pos != self.path[-1]:
             # Tìm path từ ghost đến pacman
-            self.path = pink_ghost_path(ghost_pos, pacman_pos, graph)
+            self.path = pink_ghost_path(ghost_pos, pacman_pos, graph, other_ghost_positions)
         # Nếu không tìm thấy path thì ghost sẽ không di chuyển
         if len(self.path) == 0:
             return False

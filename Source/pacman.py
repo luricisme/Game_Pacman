@@ -9,6 +9,7 @@ class Pacman:
         self.images = [pygame.transform.scale(pygame.image.load(f'Source/assets/pacman/{i}.png'), (45, 45)) for i in range(1, 5)]
         self.x = x
         self.y = y
+        self.isLive = True
         self.direction = 0
         self.direction_command = -1
         self.counter = 0
