@@ -4,7 +4,7 @@ import heapq
 import math
 
 
-def astar_search(start, goal, graph):
+def astar_search(start, goal, graph, blocked_positions=[]):
     nodes_expanded = 0
 
     # Bắt đầu đo thời gian và bộ nhớ để đánh giá hiệu suất thuật toán
@@ -53,20 +53,21 @@ def astar_search(start, goal, graph):
 
         # Xét tất cả các nút kề với nút hiện tại
         for neighbor in graph[current]:
-            if neighbor not in explored:
+            if neighbor in explored or neighbor in blocked_positions:
+                continue
                 # Tính toán chi phí g_score mới khi đi từ nút hiện tại đến nút kề
-                new_g_score = g_score + calculate_cost(current, neighbor)
+            new_g_score = g_score + calculate_cost(current, neighbor)
 
-                # Tính toán chi phí heuristic (h_score) từ nút kề đến đích
-                h_score = heuristic(neighbor, goal)
+            # Tính toán chi phí heuristic (h_score) từ nút kề đến đích
+            h_score = heuristic(neighbor, goal)
 
-                # Tính toán tổng chi phí ước tính (f_score = g_score + h_score)
-                f_score = new_g_score + h_score
+            # Tính toán tổng chi phí ước tính (f_score = g_score + h_score)
+            f_score = new_g_score + h_score
 
-                # Thêm nút kề vào hàng đợi ưu tiên với các thông tin cần thiết
-                heapq.heappush(frontier,
-                               (f_score, counter, neighbor, path + [neighbor], new_g_score))
-                counter += 1  # Tăng bộ đếm để đảm bảo tính ổn định khi sắp xếp
+            # Thêm nút kề vào hàng đợi ưu tiên với các thông tin cần thiết
+            heapq.heappush(frontier,
+                            (f_score, counter, neighbor, path + [neighbor], new_g_score))
+            counter += 1  # Tăng bộ đếm để đảm bảo tính ổn định khi sắp xếp
 
     # Nếu không tìm thấy đường đi đến đích
     end_time = time.perf_counter()
@@ -117,7 +118,7 @@ def calculate_cost(current, next_node):
     return base_cost
 
 
-def red_ghost_path(ghost_pos, pacman_pos, graph):
+def red_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
     """
     Triển khai chiến lược tìm đường cho Ma đỏ.
 
@@ -133,7 +134,7 @@ def red_ghost_path(ghost_pos, pacman_pos, graph):
         return []  # Không cần đường đi vì đã đến đích
 
     # Thực hiện tìm kiếm A* để tìm đường đi tối ưu
-    result = astar_search(ghost_pos, pacman_pos, graph)
+    result = astar_search(ghost_pos, pacman_pos, graph, blocked_positions)
 
     # Xử lý kết quả tìm kiếm
     if result:

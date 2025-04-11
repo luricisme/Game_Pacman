@@ -138,7 +138,7 @@ class Ghost:
     def move_to_box(self):
         pass
 
-    def move_orange(self, pacman_pos, graph):
+    def move_orange(self, pacman_pos, graph, other_ghost_positions, player):
         ghost_pos = self.get_map_position()
 
         # Nếu ghost đã chết và không ở trong box thì không di chuyển
@@ -155,6 +155,7 @@ class Ghost:
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
         if pacman_pos == ghost_pos and not self.powerup:
             print("Pacman eaten")
+            player.isLive = False
             self.path = []
             return False
 
@@ -177,7 +178,7 @@ class Ghost:
         if self.path == [] or pacman_pos != self.path[-1]:
             # Tìm path từ ghost đến pacman
             from levels.level03 import orange_ghost_path
-            self.path = orange_ghost_path(ghost_pos, pacman_pos, graph)
+            self.path = orange_ghost_path(ghost_pos, pacman_pos, graph, other_ghost_positions)
 
         # Nếu không tìm thấy path thì ghost sẽ không di chuyển
         if len(self.path) == 0:
@@ -190,8 +191,13 @@ class Ghost:
             return True
         return False
 
-    def move_red(self, pacman_pos, graph):
+    def move_red(self, pacman_pos, graph, other_ghost_positions, player):
         ghost_pos = self.get_map_position()
+
+         # Delay khi spawn
+        if self.delay_counter < self.spawn_delay:
+            self.delay_counter += 1
+            return False
 
         # Nếu ghost đã chết và không ở trong box thì không di chuyển
         if self.dead and not self.in_box:
@@ -207,6 +213,7 @@ class Ghost:
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
         if pacman_pos == ghost_pos and not self.powerup:
             print("Pacman eaten")
+            player.isLive = False
             self.path = []
             return False
 
@@ -243,7 +250,7 @@ class Ghost:
         return False
 
     def move_blue(self, pacman_pos, graph, other_ghost_positions, player):
-         # Delay khi spawn
+        # Delay khi spawn
         if self.delay_counter < self.spawn_delay:
             self.delay_counter += 1
             return False
