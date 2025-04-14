@@ -10,9 +10,11 @@ def calculate_path_length(path):
         length += abs(path[i][0] - path[i + 1][0]) + abs(path[i][1] - path[i + 1][1])
     return length
 
-def dfs(graph, start, goal):
+def dfs(graph, start, goal, blocked_positions=[]):
     start_time = time.time()
     tracemalloc.start()
+
+    blocked_set = set(blocked_positions)
 
     stack = [(start, [start])]
     visited = set()
@@ -20,7 +22,7 @@ def dfs(graph, start, goal):
 
     while stack:
         current, path = stack.pop()
-        if current in visited:
+        if current in visited or current in blocked_set:
             continue
         visited.add(current)
         nodes_expanded += 1
@@ -35,8 +37,8 @@ def dfs(graph, start, goal):
                 'time_ms': (end_time - start_time) * 1000,
                 'memory_kb': peak_mem/ 1024
             }
-        for neighbor in reversed(graph[current]):
-            if neighbor not in visited:
+        for neighbor in reversed(graph.get(current, [])):
+            if neighbor not in visited and neighbor not in blocked_set:
                 stack.append((neighbor, path + [neighbor]))
 
     end_time = time.time()
@@ -44,13 +46,13 @@ def dfs(graph, start, goal):
     return None
 
 
-def pink_ghost_path(ghost_pos, pacman_pos, graph):    
+def pink_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):    
     #  Check if the ghost is already at the pacman's position
     if ghost_pos == pacman_pos:
         return []  # No path needed
     #  Record search time, memory usage, and number of expanded nodes 
     # print("graph", graph)   
-    result = dfs(graph, ghost_pos, pacman_pos)
+    result = dfs(graph, ghost_pos, pacman_pos, blocked_positions)
     if result:
         print(f"Pink ghost path found:")
         print("Path found:", result['path'])

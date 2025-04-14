@@ -3,7 +3,7 @@ import tracemalloc
 import heapq
 
 
-def ucs(start, goal, graph):
+def ucs(start, goal, graph, blocked_positions=[]):
     """
     Thuật toán tìm kiếm theo chi phí đồng nhất
     """
@@ -53,18 +53,19 @@ def ucs(start, goal, graph):
 
         # Xét tất cả các nút kề với nút hiện tại
         for neighbor in graph[current]:
-            if neighbor not in explored:
-                step_cost = calculate_cost(current, neighbor)
-                new_actual_cost = actual_cost + step_cost
+            if neighbor in explored or neighbor in blocked_positions:
+                continue
+            step_cost = calculate_cost(current, neighbor)
+            new_actual_cost = actual_cost + step_cost
 
-                # heuristic = manhattan_distance(neighbor, goal)
-                # priority = new_actual_cost + heuristic
-                priority = new_actual_cost
+            # heuristic = manhattan_distance(neighbor, goal)
+            # priority = new_actual_cost + heuristic
+            priority = new_actual_cost
 
-                # Thêm nút kề vào hàng đợi ưu tiên
-                heapq.heappush(frontier,
-                               (priority, counter, neighbor, path + [neighbor], new_actual_cost))
-                counter += 1  # Tăng bộ đếm để đảm bảo tính ổn định khi sắp xếp
+            # Thêm nút kề vào hàng đợi ưu tiên
+            heapq.heappush(frontier,
+                            (priority, counter, neighbor, path + [neighbor], new_actual_cost))
+            counter += 1  # Tăng bộ đếm để đảm bảo tính ổn định khi sắp xếp
 
     # Nếu không tìm thấy đường đi đến đích
     end_time = time.perf_counter()
@@ -114,7 +115,7 @@ def calculate_cost(next_node, goal):
     return 1 + (risk_factor / 20) + (distance_to_goal / 100)
 
 
-def orange_ghost_path(ghost_pos, pacman_pos, graph):
+def orange_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
     """
     Chiến lược của Ma Cam: Sử dụng thuật toán Uniform Cost Search với hàm
     chi phí đặc biệt để tìm đường đến Pacman.
@@ -131,7 +132,7 @@ def orange_ghost_path(ghost_pos, pacman_pos, graph):
     if ghost_pos == pacman_pos:
         return []  # Không cần đường đi vì đã đến đích
 
-    result = ucs(ghost_pos, pacman_pos, graph)
+    result = ucs(ghost_pos, pacman_pos, graph, blocked_positions)
 
     # Xử lý kết quả tìm kiếm
     if result:

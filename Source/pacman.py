@@ -9,11 +9,19 @@ class Pacman:
         self.images = [pygame.transform.scale(pygame.image.load(f'Source/assets/pacman/{i}.png'), (45, 45)) for i in range(1, 5)]
         self.x = x
         self.y = y
+
+        self.isLive = True
         self.direction = 0
-        self.direction_command = -1
+        self.direction_command = 0
+        self.speed = 2
+        self.turns_allowed = [False, False, False, False]
+
         self.counter = 0
-        self.speed = 3
+        self.startup_counter = 0
+        self.flicker = False
+
         self.score = 0
+        self.moving = True
         self.powerup = False
         self.power_counter = 0
         self.eaten_ghosts = [False, False, False, False]        
@@ -31,14 +39,14 @@ class Pacman:
             screen.blit(self.images[self.counter // 5], (self.x, self.y))
             
     
-    def move(self, turns_allowed):
-        if self.direction == 0 and turns_allowed[0]:
+    def move(self):
+        if self.direction == 0 and self.turns_allowed[0]:
             self.x += self.speed
-        elif self.direction == 1 and turns_allowed[1]:
+        elif self.direction == 1 and self.turns_allowed[1]:
             self.x -= self.speed
-        elif self.direction == 2 and turns_allowed[2]:
+        elif self.direction == 2 and self.turns_allowed[2]:
             self.y -= self.speed
-        elif self.direction == 3 and turns_allowed[3]:
+        elif self.direction == 3 and self.turns_allowed[3]:
             self.y += self.speed
     
     def get_position(self):
