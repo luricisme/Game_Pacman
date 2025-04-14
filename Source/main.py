@@ -185,34 +185,34 @@ def run_game(level):
     if level == 1:  
         print("---------------\nLevel 1")
         # Blue Ghost
-        ghosts.append(Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
+        ghosts.append(Ghost('blue', 428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
     elif level == 2:  
         print("---------------\nLevel 2")
         # Pink Ghost
-        ghosts.append(Ghost(428, 386, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
+        ghosts.append(Ghost('pink', 428, 386, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
     elif level == 3:  
         print("---------------\nLevel 3")
         # Orange Ghost
-        ghosts.append(Ghost(428, 386, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
+        ghosts.append(Ghost('orange', 428, 386, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
     elif level == 4:  
         print("---------------\nLevel 4")
         # Red Ghost
-        ghosts.append(Ghost(428, 386, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
+        ghosts.append(Ghost('red', 428, 386, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
     elif level == 5:  # All Ghosts
         print("---------------\nLevel 5")
         ghosts = [
-            Ghost(478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost(428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost(378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost('red', 478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost('pink', 428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost('blue', 428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost('orange', 378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
         ]
     elif level == 6:  # Pacman Mode (Pacman tránh ma)
         print("---------------\nLevel 6")
         ghosts = [
-            Ghost(478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=60),
-            Ghost(428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=60),
-            Ghost(428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=60),
-            Ghost(378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=60),
+            Ghost('red', 478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost('pink', 428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost('blue', 428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost('orange', 378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
         ]
     
     def draw_board():
@@ -286,17 +286,20 @@ def run_game(level):
         for ghost in ghosts:
             ghost.draw()
 
-            # Lấy vị trí của các con ghost khác
+            # # Lấy vị trí của các con ghost khác
+            # other_ghost_positions = [g.get_map_position() for g in ghosts if g != ghost]
+            # # Thêm logic di chuyển ma tương ứng với từng loại ma
+            # if ghost.id == 0:  # Red ghost
+            #     ghost.move_red(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
+            # elif ghost.id == 1:  # Pink ghost
+            #     ghost.move_pink(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
+            # elif ghost.id == 2:  # Blue ghost
+            #     ghost.move_blue(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
+            # elif ghost.id == 3:  # Orange ghost
+            #     ghost.move_orange(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
+
             other_ghost_positions = [g.get_map_position() for g in ghosts if g != ghost]
-            # Thêm logic di chuyển ma tương ứng với từng loại ma
-            if ghost.id == 0:  # Red ghost
-                ghost.move_red(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
-            elif ghost.id == 1:  # Pink ghost
-                ghost.move_pink(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
-            elif ghost.id == 2:  # Blue ghost
-                ghost.move_blue(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
-            elif ghost.id == 3:  # Orange ghost
-                ghost.move_orange(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
+            ghost.start_pathfinding(player.get_position(), graph, other_ghost_positions, player)
 
         if level == 6:
             # print("LEVEL 06 LOGIC CODE")
