@@ -5,6 +5,27 @@ import math
 
 
 def astar_search(start, goal, graph, blocked_positions=[]):
+    """
+    Thuật toán tìm kiếm A* (A-star)
+
+    Thuật toán này tìm đường đi tối ưu từ điểm xuất phát đến đích
+    bằng cách kết hợp chi phí thực tế (g_score) và ước lượng heuristic (h_score).
+
+    Tham số:
+        start: Vị trí bắt đầu của Ghost, dạng tuple (x, y)
+        goal: Vị trí của Pac-Man, dạng tuple (x, y)
+        graph: Đồ thị biểu diễn mê cung (dạng dictionary của adjacency list)
+        blocked_positions: Danh sách vị trí bị chặn (các ma khác hoặc tường)
+
+    Trả về:
+        dict: Thông tin về đường đi tìm được, bao gồm:
+            - path: Danh sách các vị trí trên đường đi
+            - nodes_expanded: Số nút đã được mở rộng
+            - time_ms: Thời gian thực thi (miligiây)
+            - memory_kb: Bộ nhớ sử dụng (KB)
+            - cost: Tổng chi phí của đường đi
+        Hoặc None nếu không tìm thấy đường đi
+    """
     nodes_expanded = 0
 
     # Bắt đầu đo thời gian và bộ nhớ để đánh giá hiệu suất thuật toán
@@ -20,22 +41,29 @@ def astar_search(start, goal, graph, blocked_positions=[]):
     # - g_score: chi phí thực tế từ điểm bắt đầu đến nút hiện tại
     frontier = [(heuristic(start, goal), 0, start, [start], 0)]
 
+    # Từ điển theo dõi các nút trong frontier với chi phí g_score tương ứng
+    # Cấu trúc: {nút: g_score}
+    frontier_dict = {start: 0}
+
     # Tập hợp các nút đã khám phá để tránh xét lại
     explored = set()
+
+    # Bộ đếm tăng dần để đảm bảo tính ổn định của hàng đợi ưu tiên
     counter = 1
 
     while frontier:
         # Lấy nút có độ ưu tiên cao nhất (f_score thấp nhất) từ hàng đợi
-        _, _, current, path, g_score = heapq.heappop(frontier)
+        f_score, _, current, path, g_score = heapq.heappop(frontier)
         nodes_expanded += 1
 
         # Nếu đã đến đích, kết thúc tìm kiếm và trả về kết quả
         if current == goal:
+            # Kết thúc đo thời gian và bộ nhớ
             end_time = time.perf_counter()
             current_mem, peak_mem = tracemalloc.get_traced_memory()
             tracemalloc.stop()
-            # Trả về kết quả chi tiết: đường đi, số nút đã mở rộng, thời gian thực thi,
-            # lượng bộ nhớ sử dụng và tổng chi phí đường đi
+
+            # Trả về kết quả chi tiết về đường đi tìm được
             return {
                 'path': path,  # Danh sách các nút trên đường đi
                 'nodes_expanded': nodes_expanded,  # Số nút đã khám phá
@@ -53,21 +81,37 @@ def astar_search(start, goal, graph, blocked_positions=[]):
 
         # Xét tất cả các nút kề với nút hiện tại
         for neighbor in graph[current]:
+            # Bỏ qua nút kề nếu đã khám phá hoặc là vị trí bị chặn
             if neighbor in explored or neighbor in blocked_positions:
                 continue
-                # Tính toán chi phí g_score mới khi đi từ nút hiện tại đến nút kề
+
+            # Tính toán chi phí g_score mới khi đi từ nút hiện tại đến nút kề
             new_g_score = g_score + calculate_cost(current, neighbor)
 
-            # Tính toán chi phí heuristic (h_score) từ nút kề đến đích
-            h_score = heuristic(neighbor, goal)
+            if neighbor in frontier_dict:
+                # Nếu nút kề đã có trong frontier với chi phí cao hơn, cập nhật
+                if frontier_dict[neighbor] > new_g_score:
+                    # Cập nhật chi phí trong frontier_dict
+                    frontier_dict[neighbor] = new_g_score
 
-            # Tính toán tổng chi phí ước tính (f_score = g_score + h_score)
-            f_score = new_g_score + h_score
+                    # Tính toán h_score và f_score mới
+                    h_score = heuristic(neighbor, goal)
+                    f_score = new_g_score + h_score
 
-            # Thêm nút kề vào hàng đợi ưu tiên với các thông tin cần thiết
-            heapq.heappush(frontier,
-                            (f_score, counter, neighbor, path + [neighbor], new_g_score))
-            counter += 1  # Tăng bộ đếm để đảm bảo tính ổn định khi sắp xếp
+                    # Thêm nút với chi phí cập nhật vào frontier
+                    heapq.heappush(frontier, (f_score, counter, neighbor, path + [neighbor], new_g_score))
+                    counter += 1  # Tăng bộ đếm để đảm bảo tính ổn định
+            else:
+                # Nếu nút kề chưa có trong frontier, thêm vào
+                frontier_dict[neighbor] = new_g_score
+
+                # Tính toán h_score và f_score
+                h_score = heuristic(neighbor, goal)
+                f_score = new_g_score + h_score
+
+                # Thêm nút mới vào frontier
+                heapq.heappush(frontier, (f_score, counter, neighbor, path + [neighbor], new_g_score))
+                counter += 1  # Tăng bộ đếm để đảm bảo tính ổn định
 
     # Nếu không tìm thấy đường đi đến đích
     end_time = time.perf_counter()
@@ -77,40 +121,39 @@ def astar_search(start, goal, graph, blocked_positions=[]):
 
 def heuristic(current, goal):
     """
-    Hàm heuristic kết hợp để ước tính khoảng cách từ vị trí hiện tại đến đích.
+    Hàm heuristic dựa trên khoảng cách Manhattan
 
-    Kết hợp hai phương pháp:
-    - Khoảng cách Euclidean: đo khoảng cách đường chim bay, chính xác hơn trong không gian 2D
-    - Khoảng cách Manhattan: phù hợp với chuyển động trên lưới vuông góc
+    Ước tính khoảng cách từ vị trí hiện tại đến đích sử dụng khoảng cách Manhattan.
+    Phù hợp cho chuyển động trên lưới (lên, xuống, trái, phải) trong không gian 2D.
 
-    Tỷ lệ kết hợp được điều chỉnh để ưu tiên tính chủ động trong việc tiếp cận mục tiêu.
+    Tham số:
+        current: Vị trí hiện tại, dạng tuple (x, y)
+        goal: Vị trí đích cần đến, dạng tuple (x, y)
+
+    Trả về:
+        int: Khoảng cách Manhattan giữa hai vị trí
     """
-    # Khoảng cách Euclidean: căn bậc hai của tổng bình phương hiệu tọa độ
-    # Mô phỏng đường thẳng trong không gian, cho ước lượng thực tế hơn
-    euclidean = math.sqrt((current[0] - goal[0]) ** 2 + (current[1] - goal[1]) ** 2)
-
-    # Khoảng cách Manhattan: tổng giá trị tuyệt đối của hiệu tọa độ
-    # Phù hợp cho chuyển động trên lưới (lên, xuống, trái, phải)
-    manhattan = abs(current[0] - goal[0]) + abs(current[1] - goal[1])
-
-    # Kết hợp hai khoảng cách với trọng số:
-    # - 60% Euclidean: ưu tiên đường đi trực tiếp, giúp ma đỏ chủ động hơn
-    # - 40% Manhattan: giúp điều hướng tốt hơn trong môi trường lưới
-    return 0.6 * euclidean + 0.4 * manhattan
-
+    return abs(current[0] - goal[0]) + abs(current[1] - goal[1])
 
 def calculate_cost(current, next_node):
     """
-    Hàm tính chi phí di chuyển từ nút hiện tại đến nút tiếp theo cho Ma Đỏ.
+    Hàm tính chi phí di chuyển từ nút hiện tại đến nút tiếp theo cho Ma Đỏ
 
     Ma Đỏ được đặc trưng bởi tính hung hăng và quyết đoán:
-    - Luôn tìm đường đi ngắn nhất đến Pacman
+    - Luôn tìm đường đi ngắn nhất đến Pac-Man
     - Không quan tâm đến rủi ro hay an toàn
     - Sử dụng hàm chi phí đơn giản để tối ưu khoảng cách
+
+    Tham số:
+        current: Vị trí hiện tại, dạng tuple (x, y)
+        next_node: Vị trí kề đang xét để di chuyển đến, dạng tuple (x, y)
+
+    Trả về:
+        int: Chi phí di chuyển từ vị trí hiện tại đến vị trí kề (luôn là 1)
     """
     # Chi phí cơ bản cho mỗi bước di chuyển là 1
     # Hàm chi phí đơn giản vì Ma đỏ không quan tâm đến yếu tố khác
-    # ngoài việc đến được Pacman nhanh nhất có thể
+    # ngoài việc đến được Pac-Man nhanh nhất có thể
     base_cost = 1
 
     # Không có chi phí bổ sung cho bất kỳ loại di chuyển nào
@@ -120,16 +163,24 @@ def calculate_cost(current, next_node):
 
 def red_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
     """
-    Triển khai chiến lược tìm đường cho Ma đỏ.
+    Xác định đường đi cho Ma Đỏ theo Pac-Man sử dụng thuật toán A*
 
-    Đặc điểm của Ma đỏ trong Pac-Man:
-    - Rất hung hăng và trực tiếp trong việc đuổi theo Pacman
-    - Luôn tìm kiếm đường đi ngắn nhất để bắt Pacman
-    - Sử dụng thuật toán A* với heuristic kết hợp để tối ưu hóa đường đi
+    Đặc điểm của Ma Đỏ trong Pac-Man:
+    - Rất hung hăng và trực tiếp trong việc đuổi theo Pac-Man
+    - Luôn tìm kiếm đường đi ngắn nhất để bắt Pac-Man
+    - Sử dụng thuật toán A* với heuristic đặc biệt để tối ưu hóa đường đi
 
-    Hàm này tìm và trả về đường đi tối ưu từ vị trí của Ma đỏ đến vị trí của Pacman.
+    Tham số:
+        ghost_pos: Vị trí hiện tại của Ma Đỏ, dạng tuple (x, y)
+        pacman_pos: Vị trí hiện tại của Pac-Man, dạng tuple (x, y)
+        graph: Đồ thị biểu diễn mê cung
+        blocked_positions: Danh sách vị trí bị chặn (các ma khác)
+
+    Trả về:
+        list: Danh sách các vị trí trên đường đi từ Ma Đỏ đến Pac-Man
+              hoặc danh sách rỗng nếu không tìm thấy đường đi
     """
-    # Kiểm tra trường hợp đặc biệt: Ma đã ở cùng vị trí với Pacman
+    # Kiểm tra trường hợp đặc biệt: Ma đã ở cùng vị trí với Pac-Man
     if ghost_pos == pacman_pos:
         return []  # Không cần đường đi vì đã đến đích
 
@@ -138,6 +189,7 @@ def red_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
 
     # Xử lý kết quả tìm kiếm
     if result:
+        # In thông tin chi tiết về đường đi tìm được
         print(f"Red ghost path found")
         print("Path:", result['path'])  # Danh sách các vị trí trên đường đi
         print("Nodes expanded:", result['nodes_expanded'])  # Số nút đã xét trong quá trình tìm kiếm
@@ -146,52 +198,70 @@ def red_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
         print("Path cost:", result['cost'])  # Tổng chi phí đường đi
         return result['path']
     else:
+        # In thông báo nếu không tìm thấy đường đi
         print(f"No path found from ghost{ghost_pos} to pacman{pacman_pos}.\n")
         return []
 
 
 def escape_path_for_powerup(ghost_pos, pacman_pos, graph):
     """
-    Tìm đường thoát cho Ma đỏ khi Pacman đã ăn năng lượng (power pellet).
+    Tìm đường thoát cho Ma Đỏ khi Pac-Man đã ăn năng lượng (power pellet)
 
-    Khi Pacman ăn năng lượng:
-    - Ma trở nên dễ bị tổn thương và cần tránh Pacman
-    - Mục tiêu chuyển từ đuổi theo thành thoát khỏi Pacman
-    - Hàm này sử dụng A* với heuristic ngược để tối đa hóa khoảng cách
+    Khi Pac-Man ăn năng lượng:
+    - Ma trở nên dễ bị tổn thương và cần tránh Pac-Man
+    - Mục tiêu chuyển từ đuổi theo thành thoát khỏi Pac-Man
+    - Sử dụng A* biến thể để tối đa hóa khoảng cách với Pac-Man
 
     Chiến lược thoát:
-    - Tìm đường đi đến vị trí có khoảng cách an toàn từ Pacman
-    - Ưu tiên các hướng di chuyển làm tăng khoảng cách với Pacman
+    - Tìm đường đi đến vị trí có khoảng cách an toàn từ Pac-Man
+    - Ưu tiên các hướng di chuyển làm tăng khoảng cách với Pac-Man
+    - Sử dụng khoảng cách Euclidean để đánh giá mức độ an toàn
+
+    Tham số:
+        ghost_pos: Vị trí hiện tại của Ma Đỏ, dạng tuple (x, y)
+        pacman_pos: Vị trí hiện tại của Pac-Man, dạng tuple (x, y)
+        graph: Đồ thị biểu diễn mê cung
+
+    Trả về:
+        list: Danh sách các vị trí trên đường thoát
+              hoặc danh sách rỗng nếu không tìm thấy đường thoát
     """
     # Xác định khoảng cách an toàn tối thiểu cần đạt được
+    # Ma Đỏ cần khoảng cách an toàn lớn hơn các ma khác do thiếu chiến thuật phức tạp
     safe_distance = 80
 
     # Bắt đầu đo lường hiệu suất
     tracemalloc.start()
     start_time = time.perf_counter()
 
-    # Khởi tạo hàng đợi ưu tiên cho thuật toán A* với các thành phần:
-    # - ưu tiên (f_score): điểm ưu tiên tổng
-    # - counter: bộ đếm cho tính ổn định
-    # - node: nút hiện tại
-    # - path: đường đi hiện tại
-    # - distance: khoảng cách đến Pacman
+    # Khởi tạo hàng đợi ưu tiên cho thuật toán A* biến thể với các thành phần:
+    # - ưu tiên (f_score): điểm ưu tiên tổng (g_score + h_score)
+    # - counter: bộ đếm cho tính ổn định khi hai nút có cùng f_score
+    # - node: nút hiện tại đang xét
+    # - path: đường đi từ điểm bắt đầu đến nút hiện tại
+    # - distance: khoảng cách đến Pac-Man
     frontier = [(0, 0, ghost_pos, [ghost_pos], 0)]
+
+    # Tập hợp các nút đã khám phá
     explored = set()
+
+    # Bộ đếm để đảm bảo tính ổn định của hàng đợi ưu tiên
     counter = 1
 
     while frontier:
         # Lấy nút có độ ưu tiên cao nhất từ hàng đợi
         _, _, current, path, _ = heapq.heappop(frontier)
 
-        # Kiểm tra xem đã đạt được khoảng cách an toàn chưa
-        # Sử dụng khoảng cách Euclidean để đo khoảng cách thực tế đến Pacman
+        # Tính khoảng cách Euclidean từ vị trí hiện tại đến Pac-Man
+        # Sử dụng Euclidean vì nó cho đánh giá chính xác hơn về khoảng cách thực tế
         distance_to_pacman = math.sqrt((current[0] - pacman_pos[0]) ** 2 + (current[1] - pacman_pos[1]) ** 2)
+
+        # Kiểm tra xem đã đạt được khoảng cách an toàn chưa
         if distance_to_pacman >= safe_distance:
             # Đã đạt khoảng cách an toàn, kết thúc tìm kiếm
             end_time = time.perf_counter()
             tracemalloc.stop()
-            return path
+            return path  # Trả về đường đi đến vị trí an toàn
 
         # Bỏ qua nút đã khám phá
         if current in explored:
@@ -203,18 +273,18 @@ def escape_path_for_powerup(ghost_pos, pacman_pos, graph):
         # Xét tất cả các nút kề
         for neighbor in graph[current]:
             if neighbor not in explored:
-                # Tính khoảng cách mới từ nút kề đến Pacman
+                # Tính khoảng cách mới từ nút kề đến Pac-Man
                 new_distance = math.sqrt((neighbor[0] - pacman_pos[0]) ** 2 + (neighbor[1] - pacman_pos[1]) ** 2)
 
-                # Tính điểm heuristic - giá trị âm vì chúng ta muốn TỐI ĐA HÓA khoảng cách
-                # Khác với thuật toán A* thông thường, ở đây ta ưu tiên các nút xa Pacman
+                # Tính h_score - giá trị âm vì muốn TỐI ĐA HÓA khoảng cách đến Pac-Man
+                # (khác với A* thông thường muốn tối thiểu hóa khoảng cách)
                 h_score = -new_distance
 
-                # Sử dụng độ dài đường đi làm chi phí thực tế (g_score)
+                # g_score là chi phí thực tế, ở đây dùng độ dài đường đi
                 # Ưu tiên đường đi ngắn nhất đến vị trí an toàn
                 g_score = len(path)
 
-                # Tính điểm ưu tiên tổng thể (f_score = g_score + h_score)
+                # f_score = g_score + h_score: tổng chi phí ước tính
                 priority = g_score + h_score
 
                 # Thêm nút kề vào hàng đợi ưu tiên

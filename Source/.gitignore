@@ -142,3 +142,13 @@ temp/
 *.seed
 *.pid.lock
 docker-compose.override
+
+orange_ghost_visualization.py
+orange_ghost_visualization.pyc
+orange_ghost_visualization.pyc
+orange_ghost_visualization.py~
+
+red_ghost_visualization.py
+red_ghost_visualization.pyc
+red_ghost_visualization.pyc
+red_ghost_visualization.py~
