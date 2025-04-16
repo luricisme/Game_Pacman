@@ -3,23 +3,24 @@ import tracemalloc
 import heapq
 
 
-def ucs(start, goal, graph, blocked_positions=[]):
+def ucs(start, goal, graph, blocked_positions=None):
     """
     Thuật toán tìm kiếm theo chi phí đồng nhất (Uniform Cost Search)
 
-    Thuật toán này tìm đường đi có chi phí thấp nhất từ điểm xuất phát đến đích
-    thông qua việc mở rộng các nút theo thứ tự chi phí tăng dần.
+    Thuật toán này giúp Ghost tìm đường đi tối ưu đến Pac-Man dựa trên một hàm
+    chi phí tùy chỉnh. UCS luôn mở rộng nút có chi phí tích lũy thấp nhất, đảm
+    bảo tìm được đường đi tối ưu.
 
     Tham số:
-        start: Vị trí bắt đầu của Ghost
-        goal: Vị trí của Pac-Man
-        graph: Đồ thị biểu diễn mê cung (dạng dictionary của adjacency list)
+        start: Vị trí bắt đầu của Ghost, dạng tuple (x, y)
+        goal: Vị trí của Pac-Man, dạng tuple (x, y)
+        graph: Đồ thị mê cung dạng từ điển (dạng dictionary của adjacency list)
         blocked_positions: Danh sách vị trí bị chặn (các ma khác hoặc tường)
 
     Trả về:
         dict: Thông tin về đường đi tìm được, bao gồm:
             - path: Danh sách các vị trí trên đường đi
-            - nodes_expanded: Số nút đã được mở rộng
+            - nodes_expanded: Số nút đã được mở rộng/khám phá
             - time_ms: Thời gian thực thi (miligiây)
             - memory_kb: Bộ nhớ sử dụng (KB)
             - cost: Tổng chi phí của đường đi
@@ -28,6 +29,7 @@ def ucs(start, goal, graph, blocked_positions=[]):
     nodes_expanded = 0
 
     # Bắt đầu đo thời gian và bộ nhớ để đánh giá hiệu suất thuật toán
+    # tracemalloc theo dõi việc sử dụng bộ nhớ, time.perf_counter() đo thời gian chính xác
     tracemalloc.start()
     start_time = time.perf_counter()
 
@@ -35,15 +37,18 @@ def ucs(start, goal, graph, blocked_positions=[]):
     # Bộ đếm được sử dụng để đảm bảo tính ổn định khi hai nút có cùng chi phí
     frontier = [(0, 0, start, [start], 0)]
 
-    # Từ điển để theo dõi các nút trong frontier với chi phí tương ứng
+    # Từ điển lưu trữ các nút trong frontier cùng chi phí tương ứng
+    # Giúp kiểm tra nhanh xem một nút có trong frontier không và chi phí là bao nhiêu
     # Cấu trúc: {nút: chi_phí}
     frontier_dict = {start: 0}
 
-    # Từ điển lưu chi phí tối ưu của các nút đã khám phá
+    # Từ điển lưu trữ các nút đã khám phá và chi phí tối ưu đến nút đó
+    # Giúp tránh xét lại các nút đã có đường đi tối ưu
     # Cấu trúc: {nút: chi_phí_tối_ưu}
     explored = {}
 
-    counter = 1  # Bộ đếm tăng dần để đảm bảo tính ổn định của hàng đợi ưu tiên
+    # Bộ đếm tăng dần, dùng để đảm bảo ổn định khi so sánh các nút cùng chi phí
+    counter = 1
 
     while frontier:
         # Lấy nút có chi phí thấp nhất từ hàng đợi ưu tiên
@@ -84,12 +89,12 @@ def ucs(start, goal, graph, blocked_positions=[]):
                 continue
 
             # Tính toán chi phí khi di chuyển từ nút hiện tại đến nút kề
-            step_cost = calculate_cost(current, neighbor)
+            step_cost = calculate_cost(current, neighbor, pacman_pos=goal)
             new_actual_cost = actual_cost + step_cost
 
-            # Chỉ xét nút kề nếu:
-            # 1. Nút chưa được khám phá, hoặc
-            # 2. Đã tìm được đường đi với chi phí thấp hơn đến nút này
+            # Chỉ xét nút kề nếu thỏa mãn một trong hai điều kiện:
+            # 1. Nút chưa từng được khám phá, hoặc đã tìm được đường đi tốt hơn
+            # 2. Nút đang trong frontier nhưng tìm được đường đi tốt hơn
             if (neighbor not in explored or explored[neighbor] > new_actual_cost) and \
                     (neighbor not in frontier_dict or frontier_dict[neighbor] > new_actual_cost):
                 # Cập nhật hoặc thêm mới vào frontier
@@ -121,42 +126,65 @@ def manhattan_distance(a, b):
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-def calculate_cost(current, neighbor):
+def calculate_cost(current, neighbor, pacman_pos):
     """
-    Hàm tính chi phí cho Ma Cam (Orange Ghost) khi di chuyển giữa các vị trí
+    Hàm tính chi phí cho Ma Cam (Orange Ghost)
 
-    Chi phí được tính dựa trên:
-    1. Chi phí cơ bản của mỗi bước đi (1 đơn vị)
-    2. Mức độ nguy hiểm dựa trên khoảng cách đến trung tâm bản đồ
-
-    Ma Cam có đặc tính rụt rè, thích di chuyển ở vùng ngoại vi và tránh trung tâm
-    bản đồ khi có thể.
+    Ma Cam có chiến lược di chuyển đặc biệt:
+    - Tránh khu vực trung tâm bản đồ (nơi thường có nhiều nguy hiểm)
+    - Duy trì khoảng cách vừa phải với Pac-Man: không quá gần để không
+      chạm trán trực tiếp, nhưng cũng không quá xa để có thể theo dõi
 
     Tham số:
-        current: Vị trí hiện tại của ma, dạng tuple (x, y)
-        neighbor: Vị trí kề đang xét để di chuyển đến, dạng tuple (x, y)
+        current: Vị trí hiện tại của Ma Cam, dạng tuple (x, y)
+        neighbor: Vị trí kề đang xét, dạng tuple (x, y)
+        pacman_pos: Vị trí của Pac-Man, dạng tuple (x, y)
 
     Trả về:
-        float: Chi phí khi di chuyển từ vị trí hiện tại đến vị trí kề
+        float: Chi phí di chuyển đến vị trí kề (càng thấp càng được ưu tiên)
     """
-    # Định nghĩa trung tâm bản đồ
+    # Trung tâm bản đồ - nơi Ma Cam muốn tránh
     map_center = (14, 14)
 
-    # Tính khoảng cách từ vị trí kề đến trung tâm bản đồ
+    CENTER_WEIGHT = 10  # Mức độ ưu tiên việc tránh trung tâm
+    PACMAN_FOLLOW_WEIGHT = 3  # Mức độ ưu tiên việc duy trì khoảng cách với Pac-Man
+
+    # Càng gần trung tâm, chi phí càng cao -> Ghost sẽ có xu hướng tránh
     center_distance = manhattan_distance(neighbor, map_center)
 
-    # Tính yếu tố rủi ro - giá trị càng nhỏ càng an toàn (xa trung tâm)
-    # Công thức: max(0, 10 - min(center_distance/2, 5))
-    # - Khoảng cách xa trung tâm sẽ cho giá trị nhỏ hơn
-    # - Giới hạn trên của yếu tố rủi ro là 10
-    # - Giới hạn dưới là 0 (không có rủi ro)
-    risk_factor = max(0, 10 - min(center_distance / 2, 5))
+    # Ước tính khoảng cách tối đa từ bất kỳ điểm nào đến trung tâm
+    # Lấy nửa kích thước bản đồ làm chuẩn (bản đồ khoảng 30x32)
+    max_possible_distance = max(30, 32) / 2
 
-    # Tổng chi phí:
-    # - Chi phí cơ bản cho mỗi bước đi là 1
-    # - Cộng thêm yếu tố rủi ro đã được chuẩn hóa (chia cho 10)
-    # - Đảm bảo chi phí luôn dương để tuân theo nguyên lý của UCS
-    return 1 + (risk_factor / 10)
+    # Chuẩn hóa khoảng cách về đoạn [0,1]
+    # 0: Đang ở trung tâm, 1: Đang ở rìa bản đồ
+    normalized_distance = min(1.0, center_distance / max_possible_distance)
+
+    # Tính chi phí phạt cho vị trí gần trung tâm
+    # Sử dụng hàm phi tuyến (1-d)^2:
+    # - Khi d=0 (ở trung tâm): Phạt = CENTER_WEIGHT * 1 = 10
+    # - Khi d=1 (xa trung tâm): Phạt = CENTER_WEIGHT * 0 = 0
+    center_penalty = CENTER_WEIGHT * (1 - normalized_distance) ** 2
+
+    # Khoảng cách hiện tại đến Pac-Man
+    pacman_distance = manhattan_distance(neighbor, pacman_pos)
+
+    # Khoảng cách lý tưởng mà Ma Cam muốn duy trì với Pac-Man
+    # Không quá gần để tránh đối đầu, không quá xa để không mất dấu
+    ideal_distance = 8
+
+    # Chi phí dựa trên độ chênh lệch với khoảng cách lý tưởng
+    # Càng khác biệt với 8 ô, chi phí càng cao
+    pacman_factor = PACMAN_FOLLOW_WEIGHT * abs(pacman_distance - ideal_distance) / 10
+
+    # Chi phí cơ bản cho mỗi bước di chuyển
+    base_cost = 1
+
+    # Tổng chi phí = chi phí cơ bản + chi phí tránh trung tâm + chi phí theo dõi Pac-Man
+    # Chi phí càng thấp càng được ưu tiên trong thuật toán UCS
+    total_cost = base_cost + center_penalty + pacman_factor
+
+    return total_cost
 
 
 def orange_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
