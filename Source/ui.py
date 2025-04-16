@@ -1,4 +1,3 @@
-
 # Hằng số
 WIDTH = 900
 HEIGHT = 950

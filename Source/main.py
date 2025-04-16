@@ -209,10 +209,10 @@ def run_game(level):
     elif level == 6:  # Pacman Mode (Pacman tránh ma)
         print("---------------\nLevel 6")
         ghosts = [
-            Ghost('red', 478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=60),
+            Ghost('red', 478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
             Ghost('pink', 428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
             Ghost('blue', 428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost('orange', 378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=120),
+            Ghost('orange', 378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
         ]
     
     def draw_board():
@@ -282,10 +282,11 @@ def run_game(level):
         # Hiện lên player
         player.draw(screen)
 
+        status_matrix = [[False for _ in range(WIDTH)] for _ in range(HEIGHT)]
         # Hiện lên ghost tương ứng với từng level
         for ghost in ghosts:
             ghost.draw()
-            ghost.start_pathfinding(player.get_position(), graph, player)
+            ghost.start_pathfinding(player.get_position(), graph, player, status_matrix)
 
         if level == 6:
             # print("LEVEL 06 LOGIC CODE")
@@ -335,6 +336,9 @@ def run_game(level):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    run = False
     
         pygame.display.flip()
 
