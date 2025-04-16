@@ -3,13 +3,15 @@ import tracemalloc
 import heapq
 import math
 
-
-def astar_search(start, goal, graph, blocked_positions=[]):
+def astar_search(start, goal, graph, blocked_positions=None):
     """
     Thuật toán tìm kiếm A* (A-star)
 
     Thuật toán này tìm đường đi tối ưu từ điểm xuất phát đến đích
     bằng cách kết hợp chi phí thực tế (g_score) và ước lượng heuristic (h_score).
+    Công thức: f_score = g_score + h_score, trong đó:
+    - g_score: Chi phí thực tế từ vị trí bắt đầu đến vị trí hiện tại
+    - h_score: Ước tính chi phí từ vị trí hiện tại đến đích (Manhattan distance)
 
     Tham số:
         start: Vị trí bắt đầu của Ghost, dạng tuple (x, y)
@@ -20,12 +22,16 @@ def astar_search(start, goal, graph, blocked_positions=[]):
     Trả về:
         dict: Thông tin về đường đi tìm được, bao gồm:
             - path: Danh sách các vị trí trên đường đi
-            - nodes_expanded: Số nút đã được mở rộng
+            - nodes_expanded: Số nút đã được mở rộng/khám phá
             - time_ms: Thời gian thực thi (miligiây)
             - memory_kb: Bộ nhớ sử dụng (KB)
             - cost: Tổng chi phí của đường đi
         Hoặc None nếu không tìm thấy đường đi
     """
+    # Khởi tạo danh sách rỗng nếu không có vị trí bị chặn
+    if blocked_positions is None:
+        blocked_positions = []
+
     nodes_expanded = 0
 
     # Bắt đầu đo thời gian và bộ nhớ để đánh giá hiệu suất thuật toán
@@ -124,7 +130,11 @@ def heuristic(current, goal):
     Hàm heuristic dựa trên khoảng cách Manhattan
 
     Ước tính khoảng cách từ vị trí hiện tại đến đích sử dụng khoảng cách Manhattan.
-    Phù hợp cho chuyển động trên lưới (lên, xuống, trái, phải) trong không gian 2D.
+    Công thức: |x1 - x2| + |y1 - y2|
+
+    Đây là heuristic admissible (không bao giờ ước tính quá thực tế), đảm bảo
+    thuật toán A* tìm ra đường đi tối ưu. Phù hợp cho chuyển động trên lưới
+    (lên, xuống, trái, phải) trong không gian 2D như trong trò chơi Pac-Man.
 
     Tham số:
         current: Vị trí hiện tại, dạng tuple (x, y)
@@ -135,14 +145,21 @@ def heuristic(current, goal):
     """
     return abs(current[0] - goal[0]) + abs(current[1] - goal[1])
 
+
 def calculate_cost(current, next_node):
     """
     Hàm tính chi phí di chuyển từ nút hiện tại đến nút tiếp theo cho Ma Đỏ
 
+    Hàm này cung cấp giá trị g_score trong thuật toán A* (chi phí thực tế
+    để di chuyển từ vị trí bắt đầu đến vị trí hiện tại).
+
     Ma Đỏ được đặc trưng bởi tính hung hăng và quyết đoán:
     - Luôn tìm đường đi ngắn nhất đến Pac-Man
     - Không quan tâm đến rủi ro hay an toàn
-    - Sử dụng hàm chi phí đơn giản để tối ưu khoảng cách
+    - Sử dụng hàm chi phí đồng đều (mỗi bước = 1) để tìm đường đi ngắn nhất
+
+    Chi phí đồng đều phù hợp với Ma Đỏ vì nó giúp tìm đường đi với số bước ít nhất,
+    đúng với tính cách truy đuổi trực tiếp của Ma Đỏ trong trò chơi Pac-Man.
 
     Tham số:
         current: Vị trí hiện tại, dạng tuple (x, y)
@@ -161,25 +178,35 @@ def calculate_cost(current, next_node):
     return base_cost
 
 
-def red_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
+def red_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=None):
     """
     Xác định đường đi cho Ma Đỏ theo Pac-Man sử dụng thuật toán A*
 
     Đặc điểm của Ma Đỏ trong Pac-Man:
     - Rất hung hăng và trực tiếp trong việc đuổi theo Pac-Man
     - Luôn tìm kiếm đường đi ngắn nhất để bắt Pac-Man
-    - Sử dụng thuật toán A* với heuristic đặc biệt để tối ưu hóa đường đi
+    - Sử dụng thuật toán A* với heuristic khoảng cách Manhattan để tối ưu hóa đường đi
+
+    Hàm này xử lý các trường hợp đặc biệt:
+    1. Ma đã ở cùng vị trí với Pac-Man
+    2. Không tìm thấy đường đi đến Pac-Man (có thể do bị chặn hoàn toàn)
 
     Tham số:
         ghost_pos: Vị trí hiện tại của Ma Đỏ, dạng tuple (x, y)
         pacman_pos: Vị trí hiện tại của Pac-Man, dạng tuple (x, y)
-        graph: Đồ thị biểu diễn mê cung
-        blocked_positions: Danh sách vị trí bị chặn (các ma khác)
+        graph: Đồ thị biểu diễn mê cung (dictionary với key là vị trí và
+               value là danh sách các vị trí kề có thể di chuyển đến)
+        blocked_positions: Danh sách vị trí bị chặn (các ma khác hoặc vật cản),
+                          mặc định là None
 
     Trả về:
         list: Danh sách các vị trí trên đường đi từ Ma Đỏ đến Pac-Man
-              hoặc danh sách rỗng nếu không tìm thấy đường đi
+              hoặc danh sách rỗng nếu không tìm thấy đường đi hoặc đã ở vị trí Pac-Man
     """
+    # Khởi tạo danh sách rỗng nếu không có vị trí bị chặn
+    if blocked_positions is None:
+        blocked_positions = []
+
     # Kiểm tra trường hợp đặc biệt: Ma đã ở cùng vị trí với Pac-Man
     if ghost_pos == pacman_pos:
         return []  # Không cần đường đi vì đã đến đích
@@ -201,7 +228,6 @@ def red_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
         # In thông báo nếu không tìm thấy đường đi
         print(f"No path found from ghost{ghost_pos} to pacman{pacman_pos}.\n")
         return []
-
 
 def escape_path_for_powerup(ghost_pos, pacman_pos, graph):
     """

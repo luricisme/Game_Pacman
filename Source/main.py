@@ -173,7 +173,11 @@ def run_game(level):
     # Game state
     # player = None
     # (800, 50), (450, 663), (800, 800), (200, 300), (50, 800)
-    player = Pacman(50, 800) 
+    player = Pacman(800, 50)
+    # player = Pacman(450, 663)
+    # player = Pacman(800, 800)
+    # player = Pacman(200, 300)
+    # player = Pacman(50, 800)
     run = True
     
     # Mảng chứa ghosts
