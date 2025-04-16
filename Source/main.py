@@ -1,5 +1,6 @@
 import pygame
 import sys
+import copy
 import global_var
 from ui import *
 from pacman import Pacman
@@ -163,9 +164,9 @@ def main_menu():
 def run_game(level):
     # Khởi động bàn cờ
     if level == 6: # Bàn cờ đầy đủ
-        level_data = boards
+        level_data = copy.deepcopy(boards)
     else:
-        level_data = board_only_ghost
+        level_data = copy.deepcopy(board_only_ghost)
 
     lives = 3
     ghost_speed = 2
