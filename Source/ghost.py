@@ -30,22 +30,8 @@ class Ghost:
         self.spawn_delay = spawn_delay
         self.delay_counter = 0
         self.path = []
-        self.pathfinding_thread = None
-        self.pathfinding_lock = threading.Lock()
-        self.is_pathfinding = False
-        self.path = []
     
     def start_pathfinding(self, player_pos, graph, player):
-        if not self.is_pathfinding and (self.pathfinding_thread is None or not self.pathfinding_thread.is_alive()):
-            self.is_pathfinding = True
-            self.pathfinding_thread = threading.Thread(
-                target=self.pathfinding_worker,
-                args=(player_pos, graph, player)
-            )
-            self.pathfinding_thread.start()
-
-    
-    def pathfinding_worker(self, player_pos, graph, player):
         try:
             if self.type == 'red':
                 self.move_red(player_pos, graph, player)
@@ -170,6 +156,10 @@ class Ghost:
     # Cải tiến: Đi hết path cũ rồi mới cập nhật lại path mới
     def move_orange(self, pacman_pos, graph, player):
         ghost_pos = self.get_map_position()
+
+        if self.delay_counter < self.spawn_delay:
+            self.delay_counter += 1
+            return False
 
         if self.dead and not self.in_box:
             return False
