@@ -174,35 +174,22 @@ class Ghost:
             return False
 
         # Nếu global_var.powerup
-        # if global_var.powerup:
-        #     if not self.path:  # Hết đường đi thì tính lại
-        #         self.target = pacman_pos
-        #         from levels.level03 import escape_path_for_powerup
-        #         self.path = escape_path_for_powerup(ghost_pos, pacman_pos, graph)
-        #         print("Orange ghost escaping from powered-up Pacman!")
-
-        # else:
-        #     if not self.path:  # Hết đường thì mới tính lại
-        #         self.target = pacman_pos
-        #         from levels.level03 import orange_ghost_path
-        #         self.path = orange_ghost_path(ghost_pos, pacman_pos, graph)
-
         if global_var.powerup:
             # Tính toán đường đi mới khi cần (nếu hết path hoặc cooldown = 0)
             if not self.path or self.target != pacman_pos or getattr(self, "path_update_cooldown", 0) <= 0:
                 self.target = pacman_pos
-                from levels.level04 import escape_path_for_powerup
+                from levels.level03 import escape_path_for_powerup
                 self.path = escape_path_for_powerup(ghost_pos, pacman_pos, graph)
                 self.path_update_cooldown = 60  # Ví dụ: cập nhật path mỗi 60 frame
-                print("Red ghost escaping from powered-up Pacman!")
+                print("Orange ghost escaping from powered-up Pacman!")
             else:
                 self.path_update_cooldown -= 1
-
-            if self.path:
-                if self.move_to_node(self.path[0]):
-                    self.path.pop(0)
-                return True
             return False
+        else:
+            if not self.path:  # Hết đường thì mới tính lại
+                self.target = pacman_pos
+                from levels.level03 import orange_ghost_path
+                self.path = orange_ghost_path(ghost_pos, pacman_pos, graph)
 
         # Di chuyển theo path hiện tại
         if self.path:
@@ -257,8 +244,15 @@ class Ghost:
                 self.path_update_cooldown -= 1
 
             if self.path:
-                if self.move_to_node(self.path[0]):
+                next_node = self.path[0]
+
+                if status_matrix[next_node[1]][next_node[0]]:
+                    return False
+                
+                if self.move_to_node(next_node):
                     self.path.pop(0)
+                    # ✅ Đánh dấu ô mới đã bị chiếm
+                    status_matrix[next_node[1]][next_node[0]] = True
                 return True
             return False
 
