@@ -1,6 +1,7 @@
 import pygame
 import math
 from ui import *
+import global_var
 
 PI = math.pi
 
@@ -22,9 +23,7 @@ class Pacman:
 
         self.score = 0
         self.moving = True
-        self.powerup = False
-        self.power_counter = 0
-        self.eaten_ghosts = [False, False, False, False]        
+        self.power_counter = 0   
 
     def draw(self, screen):
         if self.direction == 0:
@@ -117,9 +116,9 @@ class Pacman:
             elif level[row][col] == 2:
                 level[row][col] = 0
                 self.score += 50
-                self.powerup = True
+                global_var.powerup = True
+                print("POWER UP IN PACMAN: ", global_var.powerup)
                 self.power_counter = 0
                 self.eaten_ghosts = [False, False, False, False]
-        return self.score, self.powerup, self.power_counter, self.eaten_ghosts
         
         
