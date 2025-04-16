@@ -2,10 +2,8 @@ import time
 import tracemalloc
 from collections import deque
 
-def BFS(start, goal, graph, blocked_positions=[]):
+def BFS(start, goal, graph):
     nodes_expanded = 0
-
-    blocked_set = set(blocked_positions)
 
     tracemalloc.start()
     start_time = time.perf_counter()
@@ -27,7 +25,7 @@ def BFS(start, goal, graph, blocked_positions=[]):
             }
         visited.add(current_node)
         for neighbor in graph[current_node]:
-            if neighbor not in visited and neighbor not in blocked_set:
+            if neighbor not in visited:
                 visited.add(neighbor)
                 queue.append((neighbor, path + [neighbor]))
     end_time = time.perf_counter()
@@ -42,12 +40,12 @@ def calculate_path_length(path):
         length += abs(path[i][0] - path[i + 1][0]) + abs(path[i][1] - path[i + 1][1])
     return length
 
-def blue_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):    
+def blue_ghost_path(ghost_pos, pacman_pos, graph):    
     #  Check if the ghost is already at the pacman's position
     if ghost_pos == pacman_pos:
         return []  # No path needed
     #  Record search time, memory usage, and number of expanded nodes    
-    result = BFS(ghost_pos, pacman_pos, graph, blocked_positions)
+    result = BFS(ghost_pos, pacman_pos, graph)
     if result:
         print(f"Blue ghost path found:")
         print("Path found:", result['path'])

@@ -4,7 +4,7 @@ import heapq
 import math
 
 
-def astar_search(start, goal, graph, blocked_positions=[]):
+def astar_search(start, goal, graph):
     """
     Thuật toán tìm kiếm A* (A-star)
 
@@ -81,8 +81,8 @@ def astar_search(start, goal, graph, blocked_positions=[]):
 
         # Xét tất cả các nút kề với nút hiện tại
         for neighbor in graph[current]:
-            # Bỏ qua nút kề nếu đã khám phá hoặc là vị trí bị chặn
-            if neighbor in explored or neighbor in blocked_positions:
+            # Bỏ qua nút kề nếu đã khám phá
+            if neighbor in explored:
                 continue
 
             # Tính toán chi phí g_score mới khi đi từ nút hiện tại đến nút kề
@@ -161,7 +161,7 @@ def calculate_cost(current, next_node):
     return base_cost
 
 
-def red_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
+def red_ghost_path(ghost_pos, pacman_pos, graph):
     """
     Xác định đường đi cho Ma Đỏ theo Pac-Man sử dụng thuật toán A*
 
@@ -185,7 +185,7 @@ def red_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
         return []  # Không cần đường đi vì đã đến đích
 
     # Thực hiện tìm kiếm A* để tìm đường đi tối ưu
-    result = astar_search(ghost_pos, pacman_pos, graph, blocked_positions)
+    result = astar_search(ghost_pos, pacman_pos, graph)
 
     # Xử lý kết quả tìm kiếm
     if result:

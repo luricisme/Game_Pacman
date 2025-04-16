@@ -3,7 +3,7 @@ import tracemalloc
 import heapq
 
 
-def ucs(start, goal, graph, blocked_positions=[]):
+def ucs(start, goal, graph):
     """
     Thuật toán tìm kiếm theo chi phí đồng nhất (Uniform Cost Search)
 
@@ -79,10 +79,6 @@ def ucs(start, goal, graph, blocked_positions=[]):
 
         # Xét tất cả các nút kề với nút hiện tại
         for neighbor in graph[current]:
-            # Bỏ qua các vị trí bị chặn
-            if neighbor in blocked_positions:
-                continue
-
             # Tính toán chi phí khi di chuyển từ nút hiện tại đến nút kề
             step_cost = calculate_cost(current, neighbor)
             new_actual_cost = actual_cost + step_cost
@@ -159,7 +155,7 @@ def calculate_cost(current, neighbor):
     return 1 + (risk_factor / 10)
 
 
-def orange_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
+def orange_ghost_path(ghost_pos, pacman_pos, graph):
     """
     Xác định đường đi cho Ma Cam theo Pac-Man sử dụng thuật toán UCS
 
@@ -183,7 +179,7 @@ def orange_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=[]):
         return []  # Không cần đường đi vì đã đến đích
 
     # Gọi thuật toán UCS để tìm đường đi tối ưu
-    result = ucs(ghost_pos, pacman_pos, graph, blocked_positions)
+    result = ucs(ghost_pos, pacman_pos, graph)
 
     # Xử lý kết quả tìm kiếm
     if result:

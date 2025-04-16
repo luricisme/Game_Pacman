@@ -297,9 +297,7 @@ def run_game(level):
             #     ghost.move_blue(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
             # elif ghost.id == 3:  # Orange ghost
             #     ghost.move_orange(player.get_position(), graph=graph, other_ghost_positions=other_ghost_positions, player=player)
-
-            other_ghost_positions = [g.get_map_position() for g in ghosts if g != ghost]
-            ghost.start_pathfinding(player.get_position(), graph, other_ghost_positions, player)
+            ghost.start_pathfinding(player.get_position(), graph, player)
 
         if level == 6:
             # print("LEVEL 06 LOGIC CODE")

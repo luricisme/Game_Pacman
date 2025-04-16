@@ -34,28 +34,27 @@ class Ghost:
         self.pathfinding_lock = threading.Lock()
         self.is_pathfinding = False
         self.path = []
-        self.pathfinding_cooldown = 0
     
-    def start_pathfinding(self, player_pos, graph, other_ghost_positions, player):
+    def start_pathfinding(self, player_pos, graph, player):
         if not self.is_pathfinding and (self.pathfinding_thread is None or not self.pathfinding_thread.is_alive()):
             self.is_pathfinding = True
             self.pathfinding_thread = threading.Thread(
                 target=self.pathfinding_worker,
-                args=(player_pos, graph, other_ghost_positions, player)
+                args=(player_pos, graph, player)
             )
             self.pathfinding_thread.start()
 
     
-    def pathfinding_worker(self, player_pos, graph, other_ghost_positions, player):
+    def pathfinding_worker(self, player_pos, graph, player):
         try:
             if self.type == 'red':
-                self.move_red(player_pos, graph, other_ghost_positions, player)
+                self.move_red(player_pos, graph, player)
             elif self.type == 'pink':
-                self.move_pink(player_pos, graph, other_ghost_positions, player)
+                self.move_pink(player_pos, graph, player)
             elif self.type == 'blue':
-                self.move_blue(player_pos, graph, other_ghost_positions, player)
+                self.move_blue(player_pos, graph, player)
             elif self.type == 'orange':
-                self.move_orange(player_pos, graph, other_ghost_positions, player)
+                self.move_orange(player_pos, graph, player)
         finally:
             self.is_pathfinding = False
 
@@ -169,7 +168,7 @@ class Ghost:
         pass
 
     # Cải tiến: Đi hết path cũ rồi mới cập nhật lại path mới
-    def move_orange(self, pacman_pos, graph, other_ghost_positions, player):
+    def move_orange(self, pacman_pos, graph, player):
         ghost_pos = self.get_map_position()
 
         if self.dead and not self.in_box:
@@ -199,7 +198,7 @@ class Ghost:
             if not self.path:  # Hết đường thì mới tính lại
                 self.target = pacman_pos
                 from levels.level03 import orange_ghost_path
-                self.path = orange_ghost_path(ghost_pos, pacman_pos, graph, other_ghost_positions)
+                self.path = orange_ghost_path(ghost_pos, pacman_pos, graph)
 
         # Di chuyển theo path hiện tại
         if self.path:
@@ -209,7 +208,7 @@ class Ghost:
 
         return False
 
-    def move_red(self, pacman_pos, graph, other_ghost_positions, player):
+    def move_red(self, pacman_pos, graph, player):
         ghost_pos = self.get_map_position()
 
         # Delay khi spawn
@@ -264,8 +263,7 @@ class Ghost:
 
         return False
 
-    
-    def move_blue(self, pacman_pos, graph, other_ghost_positions, player):
+    def move_blue(self, pacman_pos, graph, player):
         # Delay khi spawn
         if self.delay_counter < self.spawn_delay:
             self.delay_counter += 1
@@ -297,7 +295,7 @@ class Ghost:
 
         # Tính path mới CHỈ khi path hiện tại đã đi hết
         if not self.path:
-            self.path = blue_ghost_path(ghost_pos, pacman_pos, graph, other_ghost_positions)
+            self.path = blue_ghost_path(ghost_pos, pacman_pos, graph)
 
         # Nếu không có path thì đứng yên
         if not self.path:
@@ -308,7 +306,7 @@ class Ghost:
             self.path.pop(0)
         return True
     
-    def move_pink(self, pacman_pos, graph, other_ghost_positions, player):
+    def move_pink(self, pacman_pos, graph, player):
         # Delay khi spawn
         if self.delay_counter < self.spawn_delay:
             self.delay_counter += 1
@@ -341,7 +339,7 @@ class Ghost:
 
         # Nếu chưa có đường đi, hoặc đã đi hết đường cũ, thì tính lại path mới
         if not self.path:
-            self.path = pink_ghost_path(ghost_pos, pacman_pos, graph, other_ghost_positions)
+            self.path = pink_ghost_path(ghost_pos, pacman_pos, graph)
 
         # Nếu không tìm thấy path thì ghost sẽ không di chuyển
         if not self.path:
