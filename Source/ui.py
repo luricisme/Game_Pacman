@@ -22,8 +22,10 @@ DARK_BLUE = (12, 9, 80)
 DARK_PINK = (125, 28, 74)
 BROWN = (78, 31, 0)
 TEAL = (154, 203, 208)
-DARK_TEAL = (36, 54, 66)
+DARK_TEAL = (39, 68, 93)
 LIGHT_PURPLE = (254, 210, 226)
+GREY = (197, 153, 182)
+
 
 #board
 boards = [
