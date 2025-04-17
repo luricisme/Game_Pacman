@@ -5,7 +5,7 @@ from levels.level01 import blue_ghost_path
 from levels.level02 import pink_ghost_path
 
 class Ghost:
-    def __init__(self, type, x_coord, y_coord, target, speed, img, direct, dead, box, id, screen, level, eaten_ghost, spooked_img, dead_img, spawn_delay=0):
+    def __init__(self, type, x_coord, y_coord, target, speed, img, direct, dead, box, id, screen, level, spooked_img, dead_img, spawn_delay=0):
         self.type = type
         self.x_pos = x_coord
         self.y_pos = y_coord
@@ -45,7 +45,7 @@ class Ghost:
             self.screen.blit(self.spooked_img, (self.x_pos, self.y_pos))
         else:
             self.screen.blit(self.dead_img, (self.x_pos, self.y_pos))
-        ghost_rect = pygame.rect.Rect((self.center_x - 18, self.center_y - 18), (36, 36))
+        ghost_rect = pygame.rect.Rect((self.x_pos, self.y_pos), (36, 36))
         return ghost_rect
     
     def get_map_position(self):
