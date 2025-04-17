@@ -117,7 +117,7 @@ class Pacman:
                 level[row][col] = 0
                 self.score += 50
                 global_var.powerup = True
-                print("POWER UP IN PACMAN: ", global_var.powerup)
+                # print("POWER UP IN PACMAN: ", global_var.powerup)
                 self.power_counter = 0
                 self.eaten_ghosts = [False, False, False, False]
         

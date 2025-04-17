@@ -28,18 +28,15 @@ class Ghost:
         self.delay_counter = 0
         self.path = []
     
-    def start_pathfinding(self, player_pos, graph, player, status_matrix):
-        try:
-            if self.type == 'red':
-                self.move_red(player_pos, graph, player, status_matrix)
-            elif self.type == 'pink':
-                self.move_pink(player_pos, graph, player, status_matrix)
-            elif self.type == 'blue':
-                self.move_blue(player_pos, graph, player, status_matrix)
-            elif self.type == 'orange':
-                self.move_orange(player_pos, graph, player, status_matrix)
-        finally:
-            self.is_pathfinding = False
+    def start_pathfinding(self, player_pos, graph, player, status_set):
+        if self.type == 'red':
+            self.move_red(player_pos, graph, player, status_set)
+        elif self.type == 'pink':
+            self.move_pink(player_pos, graph, player, status_set)
+        elif self.type == 'blue':
+            self.move_blue(player_pos, graph, player, status_set)
+        elif self.type == 'orange':
+            self.move_orange(player_pos, graph, player, status_set)
 
     def draw(self):
         if (not global_var.powerup and not self.dead) or (global_var.eaten_ghosts[self.id] and global_var.powerup and not self.dead):
@@ -151,7 +148,7 @@ class Ghost:
         pass
 
     # Cải tiến: Đi hết path cũ rồi mới cập nhật lại path mới
-    def move_orange(self, pacman_pos, graph, player, status_matrix):
+    def move_orange(self, pacman_pos, graph, player, status_set):
         ghost_pos = self.get_map_position()
 
         if self.delay_counter < self.spawn_delay:
@@ -195,18 +192,18 @@ class Ghost:
         if self.path:
             next_node = self.path[0]
 
-            if status_matrix[next_node[1]][next_node[0]]:
+            if next_node in status_set:
                 return False
             
             if self.move_to_node(next_node):
                 self.path.pop(0)
                 # ✅ Đánh dấu ô mới đã bị chiếm
-                status_matrix[next_node[1]][next_node[0]] = True
+                status_set.add(next_node)
             return True
 
         return False
 
-    def move_red(self, pacman_pos, graph, player, status_matrix):
+    def move_red(self, pacman_pos, graph, player, status_set):
         ghost_pos = self.get_map_position()
 
         # Delay khi spawn
@@ -246,13 +243,13 @@ class Ghost:
             if self.path:
                 next_node = self.path[0]
 
-                if status_matrix[next_node[1]][next_node[0]]:
+                if next_node in status_set:
                     return False
                 
                 if self.move_to_node(next_node):
                     self.path.pop(0)
                     # ✅ Đánh dấu ô mới đã bị chiếm
-                    status_matrix[next_node[1]][next_node[0]] = True
+                    status_set.add(next_node)
                 return True
             return False
 
@@ -264,18 +261,18 @@ class Ghost:
         if self.path:
             next_node = self.path[0]
 
-            if status_matrix[next_node[1]][next_node[0]]:
+            if next_node in status_set:
                 return False
             
             if self.move_to_node(next_node):
                 self.path.pop(0)
                 # ✅ Đánh dấu ô mới đã bị chiếm
-                status_matrix[next_node[1]][next_node[0]] = True
+                status_set.add(next_node)
             return True
 
         return False
 
-    def move_blue(self, pacman_pos, graph, player, status_matrix):
+    def move_blue(self, pacman_pos, graph, player, status_set):
         # Delay khi spawn
         if self.delay_counter < self.spawn_delay:
             self.delay_counter += 1
@@ -315,15 +312,15 @@ class Ghost:
 
         # Di chuyển theo path hiện tại
         next_node = self.path[0]
-        if status_matrix[next_node[1]][next_node[0]]:
+        if next_node in status_set:
             return False
         if self.move_to_node(next_node):
             self.path.pop(0)
             # ✅ Đánh dấu ô mới đã bị chiếm
-            status_matrix[next_node[1]][next_node[0]] = True
+            status_set.add(next_node)
         return True
     
-    def move_pink(self, pacman_pos, graph, player, status_matrix):
+    def move_pink(self, pacman_pos, graph, player, status_set):
         # Delay khi spawn
         if self.delay_counter < self.spawn_delay:
             self.delay_counter += 1
@@ -364,10 +361,10 @@ class Ghost:
 
         # Di chuyển theo path hiện tại
         next_node = self.path[0]
-        if status_matrix[next_node[1]][next_node[0]]:
+        if next_node in status_set:
             return False
         if self.move_to_node(next_node):
             self.path.pop(0)
             # ✅ Đánh dấu ô mới đã bị chiếm
-            status_matrix[next_node[1]][next_node[0]] = True
+            status_set.add(next_node)
         return True
