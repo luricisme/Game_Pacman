@@ -179,7 +179,6 @@ def run_game(level):
     # player = None
     
     # Target mặc định là vị trí bắt đầu của pacman
-    targets = []
     #player = Pacman(2, 5)
     #player = Pacman(30, 22)
     #player = Pacman(20, 22)
@@ -194,34 +193,34 @@ def run_game(level):
     if level == 1:  
         print("---------------\nLevel 1")
         # Blue Ghost
-        ghosts.append(Ghost('blue', 14, 15, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, spooked_img, dead_img))
+        ghosts.append(Ghost('blue', 14, 15, ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, spooked_img, dead_img))
     elif level == 2:  
         print("---------------\nLevel 2")
         # Pink Ghost
-        ghosts.append(Ghost('pink', 14, 15, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, spooked_img, dead_img))
+        ghosts.append(Ghost('pink', 14, 15, ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, spooked_img, dead_img))
     elif level == 3:  
         print("---------------\nLevel 3")
         # Orange Ghost
-        ghosts.append(Ghost('orange', 14, 15, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, spooked_img, dead_img))
+        ghosts.append(Ghost('orange', 14, 15, ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, spooked_img, dead_img))
     elif level == 4:  
         print("---------------\nLevel 4")
         # Red Ghost
-        ghosts.append(Ghost('red', 14, 15, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, spooked_img, dead_img))
+        ghosts.append(Ghost('red', 14, 15, ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, spooked_img, dead_img))
     elif level == 5:  # All Ghosts
         print("---------------\nLevel 5")
         ghosts = [
-            Ghost('red', 14, 14, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, spooked_img, dead_img, spawn_delay=0),
-            Ghost('pink', 12, 15, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, spooked_img, dead_img, spawn_delay=0),
-            Ghost('blue', 14, 13, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, spooked_img, dead_img, spawn_delay=0),
-            Ghost('orange', 14, 15, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, spooked_img, dead_img, spawn_delay=0),
+            Ghost('red', 14, 14, ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, spooked_img, dead_img, spawn_delay=0),
+            Ghost('pink', 12, 15, ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, spooked_img, dead_img, spawn_delay=0),
+            Ghost('blue', 14, 13, ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, spooked_img, dead_img, spawn_delay=0),
+            Ghost('orange', 14, 15, ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, spooked_img, dead_img, spawn_delay=0),
         ]
     elif level == 6:  # Pacman Mode (Pacman tránh ma)
         print("---------------\nLevel 6")
         ghosts = [
-            Ghost('red', 14, 14, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, spooked_img, dead_img, spawn_delay=0),
-            Ghost('pink', 12, 15, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, spooked_img, dead_img, spawn_delay=0),
-            Ghost('blue', 14, 13, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, spooked_img, dead_img, spawn_delay=0),
-            Ghost('orange', 14, 15, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, spooked_img, dead_img, spawn_delay=0),
+            Ghost('red', 14, 14, ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, spooked_img, dead_img, spawn_delay=0),
+            Ghost('pink', 12, 15, ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, spooked_img, dead_img, spawn_delay=0),
+            Ghost('blue', 14, 13, ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, spooked_img, dead_img, spawn_delay=0),
+            Ghost('orange', 14, 15, ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, spooked_img, dead_img, spawn_delay=0),
         ]
     
     def draw_board():

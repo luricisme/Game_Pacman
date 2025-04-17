@@ -5,13 +5,12 @@ from levels.level01 import *
 from levels.level02 import *
 
 class Ghost:
-    def __init__(self, type, x, y, target, speed, img, direct, dead, box, id, screen, level, spooked_img, dead_img, spawn_delay=0):
+    def __init__(self, type, x, y, speed, img, direct, dead, box, id, screen, level, spooked_img, dead_img, spawn_delay=0):
         self.type = type
         self.x_pos = y * TILE_WIDTH - TILE_WIDTH // 4
         self.y_pos = x * TILE_HEIGHT - TILE_HEIGHT // 4
         self.center_x = self.x_pos + 22
         self.center_y = self.y_pos + 22
-        self.target = target
         self.speed = speed
         self.img = img
         self.direction = direct
@@ -202,8 +201,7 @@ class Ghost:
         # Nếu global_var.powerup
         if global_var.powerup:
             # Tính toán đường đi mới khi cần (nếu hết path hoặc cooldown = 0)
-            if not self.path or self.target != pacman_pos or getattr(self, "path_update_cooldown", 0) <= 0:
-                self.target = pacman_pos
+            if not self.path or self.path[-1] != pacman_pos or getattr(self, "path_update_cooldown", 0) <= 0:
                 from levels.level03 import escape_path_for_powerup
                 self.path = escape_path_for_powerup(ghost_pos, pacman_pos, graph)
                 self.path_update_cooldown = 60  # Ví dụ: cập nhật path mỗi 60 frame
@@ -213,7 +211,6 @@ class Ghost:
             return False
         else:
             if not self.path:  # Hết đường thì mới tính lại
-                self.target = pacman_pos
                 from levels.level03 import orange_ghost_path
                 self.path = orange_ghost_path(ghost_pos, pacman_pos, graph)
 
@@ -257,8 +254,7 @@ class Ghost:
 
         if global_var.powerup:
             # Tính toán đường đi mới khi cần (nếu hết path hoặc cooldown = 0)
-            if not self.path or self.target != pacman_pos or getattr(self, "path_update_cooldown", 0) <= 0:
-                self.target = pacman_pos
+            if not self.path or self.path[-1] != pacman_pos or getattr(self, "path_update_cooldown", 0) <= 0:
                 from levels.level04 import escape_path_for_powerup
                 self.path = escape_path_for_powerup(ghost_pos, pacman_pos, graph)
                 self.path_update_cooldown = 60  # Ví dụ: cập nhật path mỗi 60 frame
@@ -318,14 +314,6 @@ class Ghost:
         if global_var.powerup:
             return False
 
-        # Nếu ghost đã chết và không ở trong box thì di chuyển về box
-        if self.dead:
-            if not self.in_box:
-                if self.move_to_box(graph):
-                    self.in_box = True
-                    self.path = []
-            return False
-
         # Nếu ghost và pacman cùng vị trí, ăn Pacman
         if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
@@ -370,9 +358,7 @@ class Ghost:
         # Nếu ghost global_var.powerup, không di chuyển và reset path
         if global_var.powerup:
             self.path = []
-            return False
-
-        
+            return False        
 
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
         if pacman_pos == ghost_pos and not global_var.powerup:
