@@ -179,17 +179,12 @@ def run_game(level):
     # player = None
     
     # Target mặc định là vị trí bắt đầu của pacman
-    targets = [(800, 50), (450, 663), (800, 800), (200, 300), (50, 800)]
-    # player = Pacman(2, 5)
-    # player = Pacman(30, 22)
-    # player = Pacman(20, 22)
-    # player = Pacman(27, 12)
-    player = Pacman(2, 27) 
-
-    # player = Pacman(450, 663)
-    # player = Pacman(800, 800)
-    # player = Pacman(200, 300)
-    # player = Pacman(50, 800)
+    targets = []
+    #player = Pacman(2, 5)
+    #player = Pacman(30, 22)
+    #player = Pacman(20, 22)
+    player = Pacman(27, 12)
+    #player = Pacman(2, 27) 
     run = True
     
     # Mảng chứa ghosts
@@ -298,15 +293,10 @@ def run_game(level):
             ghost.rect = ghost.draw()
             ghost.rect = ghost.draw()
             ghost.start_pathfinding(player.get_position(), graph, player, status_set)
-            print("PLAYER RECT: ", player_rect)
-            print("GHOST RECT: ", ghost.rect)
-            print("COLLIDE: ", player_rect.colliderect(ghost.rect))
+          
             if global_var.powerup and player_rect.colliderect(ghost.rect) and not ghost.dead and not player.eaten_ghosts[ghost.id]:
                 ghost.dead = True
                 player.eaten_ghosts[ghost.id] = True
-            print("PLAYER RECT: ", player_rect)
-            print("GHOST RECT: ", ghost.rect)
-            print("COLLIDE: ", player_rect.colliderect(ghost.rect))
             if global_var.powerup and player_rect.colliderect(ghost.rect) and not ghost.dead and not player.eaten_ghosts[ghost.id]:
                 ghost.dead = True
                 player.eaten_ghosts[ghost.id] = True
@@ -314,9 +304,7 @@ def run_game(level):
         if level == 6:
             # print("LEVEL 06 LOGIC CODE")
             if global_var.powerup and player.power_counter < 200:
-            if global_var.powerup and player.power_counter < 200:
                 player.power_counter += 1
-            elif  global_var.powerup and player.power_counter >= 200:
             elif  global_var.powerup and player.power_counter >= 200:
                 player.power_counter = 0
                 global_var.powerup = False

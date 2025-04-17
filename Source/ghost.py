@@ -299,6 +299,14 @@ class Ghost:
         return False
 
     def move_blue(self, pacman_pos, graph, player, status_set):
+        # Nếu ghost đã chết và không ở trong box thì di chuyển về box
+        if self.dead:
+            if not self.in_box:
+                if self.move_to_box(graph):
+                    self.in_box = True
+                    self.path = []
+            return False
+        
         # Delay khi spawn
         if self.delay_counter < self.spawn_delay:
             self.delay_counter += 1
@@ -344,6 +352,14 @@ class Ghost:
         return True
     
     def move_pink(self, pacman_pos, graph, player, status_set):
+        # Nếu ghost đã chết và không ở trong box thì di chuyển về box
+        if self.dead:
+            if not self.in_box:
+                if self.move_to_box(graph):
+                    self.in_box = True
+                    self.path = []
+            return False
+        
         # Delay khi spawn
         if self.delay_counter < self.spawn_delay:
             self.delay_counter += 1
@@ -356,13 +372,7 @@ class Ghost:
             self.path = []
             return False
 
-        # Nếu ghost đã chết và không ở trong box thì di chuyển về box
-        if self.dead:
-            if not self.in_box:
-                if self.move_to_box(graph):
-                    self.in_box = True
-                    self.path = []
-            return False
+        
 
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
         if pacman_pos == ghost_pos and not global_var.powerup:
