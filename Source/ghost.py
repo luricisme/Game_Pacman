@@ -46,6 +46,7 @@ class Ghost:
         else:
             self.screen.blit(self.dead_img, (self.x_pos, self.y_pos))
         ghost_rect = pygame.rect.Rect((self.x_pos, self.y_pos), (36, 36))
+        ghost_rect = pygame.rect.Rect((self.x_pos, self.y_pos), (36, 36))
         return ghost_rect
     
     def get_map_position(self):

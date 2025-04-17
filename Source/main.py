@@ -9,8 +9,7 @@ from read_map import *
 
 # Khởi tạo pygame
 pygame.init()
-# 5 Vị trí bắt đầu của Pacman
-player_pos = [(2, 5), (30, 22), (20, 22), (27, 12), (2, 27), (15, 25)]
+
 # Cài đặt màn hình
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 pygame.display.set_caption("Pac-Man")
@@ -155,7 +154,6 @@ def main_menu():
         pygame.display.flip()
         clock.tick(FPS)
 
-
 def run_game(level):
     # Khởi động bàn cờ
     if level == 6: # Bàn cờ đầy đủ
@@ -293,11 +291,19 @@ def run_game(level):
          # Hiện lên player
         player.draw(screen)
         player_rect = pygame.Rect(player.x, player.y, 40, 40)
+        player_rect = pygame.Rect(player.x, player.y, 40, 40)
         status_set = set()
         # Hiện lên ghost tương ứng với từng level
         for ghost in ghosts:
             ghost.rect = ghost.draw()
+            ghost.rect = ghost.draw()
             ghost.start_pathfinding(player.get_position(), graph, player, status_set)
+            print("PLAYER RECT: ", player_rect)
+            print("GHOST RECT: ", ghost.rect)
+            print("COLLIDE: ", player_rect.colliderect(ghost.rect))
+            if global_var.powerup and player_rect.colliderect(ghost.rect) and not ghost.dead and not player.eaten_ghosts[ghost.id]:
+                ghost.dead = True
+                player.eaten_ghosts[ghost.id] = True
             print("PLAYER RECT: ", player_rect)
             print("GHOST RECT: ", ghost.rect)
             print("COLLIDE: ", player_rect.colliderect(ghost.rect))
@@ -308,7 +314,9 @@ def run_game(level):
         if level == 6:
             # print("LEVEL 06 LOGIC CODE")
             if global_var.powerup and player.power_counter < 200:
+            if global_var.powerup and player.power_counter < 200:
                 player.power_counter += 1
+            elif  global_var.powerup and player.power_counter >= 200:
             elif  global_var.powerup and player.power_counter >= 200:
                 player.power_counter = 0
                 global_var.powerup = False
