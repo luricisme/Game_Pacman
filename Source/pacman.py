@@ -7,9 +7,9 @@ PI = math.pi
 
 class Pacman:
     def __init__(self, x, y):
-        self.images = [pygame.transform.scale(pygame.image.load(f'./assets/pacman/{i}.png'), (45, 45)) for i in range(1, 5)]
-        self.x = x
-        self.y = y
+        self.images = [pygame.transform.scale(pygame.image.load(f'./assets/pacman/{i}.png'), (40, 40)) for i in range(1, 5)]
+        self.x = y*TILE_WIDTH - TILE_WIDTH//4
+        self.y = x*TILE_HEIGHT - TILE_HEIGHT//4
 
         self.isLive = True
         self.direction = 0
@@ -49,15 +49,15 @@ class Pacman:
             self.y += self.speed
     
     def get_position(self):
-        return ((self.y+TILE_HEIGHT//2)//TILE_HEIGHT, (self.x+TILE_HEIGHT//2)//TILE_WIDTH)
+        return ((self.y +TILE_HEIGHT//4)//TILE_HEIGHT, (self.x + TILE_WIDTH//4)//TILE_WIDTH)
 
     def check_position(self, level):
         turns = [False, False, False, False]
         num1 = TILE_HEIGHT
         num2 = TILE_WIDTH
-        num3 = 15
-        centerx = self.x + 23
-        centery = self.y + 24
+        num3 = 13
+        centerx = self.x + 20
+        centery = self.y + 20
 
         if centerx // 30 < 29:
             if self.direction == 0:
@@ -74,23 +74,23 @@ class Pacman:
                     turns[2] = True
 
             if self.direction in [2, 3]:
-                if 12 <= centerx % num2 <= 18:
+                if 10 <= centerx % num2 <= 18:
                     if level[(centery + num3) // num1][centerx // num2] < 3:
                         turns[3] = True
                     if level[(centery - num3) // num1][centerx // num2] < 3:
                         turns[2] = True
-                if 12 <= centery % num1 <= 18:
+                if 10 <= centery % num1 <= 18:
                     if level[centery // num1][(centerx - num2) // num2] < 3:
                         turns[1] = True
                     if level[centery // num1][(centerx + num2) // num2] < 3:
                         turns[0] = True
             if self.direction in [0, 1]:
-                if 12 <= centerx % num2 <= 18:
+                if 10 <= centerx % num2 <= 18:
                     if level[(centery + num1) // num1][centerx // num2] < 3:
                         turns[3] = True
                     if level[(centery - num1) // num1][centerx // num2] < 3:
                         turns[2] = True
-                if 12 <= centery % num1 <= 18:
+                if 10 <= centery % num1 <= 18:
                     if level[centery // num1][(centerx - num3) // num2] < 3:
                         turns[1] = True
                     if level[centery // num1][(centerx + num3) // num2] < 3:
@@ -102,12 +102,12 @@ class Pacman:
         return turns
 
     def check_collisions(self, level):
-        num1 = (HEIGHT - 50) // 32
-        num2 = WIDTH // 30
-        center_x = self.x + 22  # ~nửa kích thước Pac-Man (45/2)
-        center_y = self.y + 22
+        num1 = TILE_HEIGHT
+        num2 = TILE_WIDTH
+        center_x = self.x + 20  # ~nửa kích thước Pac-Man (45/2)
+        center_y = self.y + 20
 
-        if 0 < center_x < 870:
+        if 0 < center_x < 770:
             row = center_y // num1
             col = center_x // num2
             if level[row][col] == 1:

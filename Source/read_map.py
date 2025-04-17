@@ -1,6 +1,6 @@
 
 def is_walkable(cell):
-    return cell <= 2  # Walkable cells are 0, 1, 2
+    return cell <= 2  or cell == 9 # 0, 1, 2, 9 are walkable cells (0: empty, 1, 2: food, 9: for ghosts)
 '''
 def is_node(i, j, grid): 
     #      

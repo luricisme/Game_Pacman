@@ -1,14 +1,14 @@
 import pygame
 import global_var
 from ui import *
-from levels.level01 import blue_ghost_path
-from levels.level02 import pink_ghost_path
+from levels.level01 import *
+from levels.level02 import *
 
 class Ghost:
-    def __init__(self, type, x_coord, y_coord, target, speed, img, direct, dead, box, id, screen, level, eaten_ghost, spooked_img, dead_img, spawn_delay=0):
+    def __init__(self, type, x, y, target, speed, img, direct, dead, box, id, screen, level, spooked_img, dead_img, spawn_delay=0):
         self.type = type
-        self.x_pos = x_coord
-        self.y_pos = y_coord
+        self.x_pos = y * TILE_WIDTH - TILE_WIDTH // 4
+        self.y_pos = x * TILE_HEIGHT - TILE_HEIGHT // 4
         self.center_x = self.x_pos + 22
         self.center_y = self.y_pos + 22
         self.target = target
@@ -45,7 +45,7 @@ class Ghost:
             self.screen.blit(self.spooked_img, (self.x_pos, self.y_pos))
         else:
             self.screen.blit(self.dead_img, (self.x_pos, self.y_pos))
-        ghost_rect = pygame.rect.Rect((self.center_x - 18, self.center_y - 18), (36, 36))
+        ghost_rect = pygame.rect.Rect((self.x_pos, self.y_pos), (36, 36))
         return ghost_rect
     
     def get_map_position(self):
@@ -144,25 +144,53 @@ class Ghost:
                 self.y_pos = node_y
         return node_x == self.x_pos and node_y == self.y_pos
 
-    def move_to_box(self):
-        pass
-
+    def move_to_box(self, graph):
+        if self.in_box:
+            return False
+        box_pos = (14, 14)  # Vị trí box của ghost
+        self.speed = 8  # Tốc độ di chuyển về box
+        # Di chuyển ghost về box
+        if self.path and self.path[-1] == box_pos:
+            next_node = self.path[0]
+            if self.move_to_node(next_node):
+                self.path.pop(0)
+                if not self.path:
+                    self.in_box = True
+                    self.speed = 2  # Đặt lại tốc độ về bình thường
+                    return True
+            return False
+        # Tính toán đường đi về box
+        from levels.level04 import astar_search
+        result = astar_search(self.get_map_position(), box_pos, graph)
+        if result:
+            self.path = result['path']
+            next_node = self.path[0]
+            if self.move_to_node(next_node):
+                self.path.pop(0)
+                if not self.path:
+                    self.in_box = True
+                    self.speed = 2          # Đặt lại tốc độ về bình thường
+                    return True
+        return False
     # Cải tiến: Đi hết path cũ rồi mới cập nhật lại path mới
     def move_orange(self, pacman_pos, graph, player, status_set):
         ghost_pos = self.get_map_position()
 
+        # Nếu ghost đã chết và không ở trong box thì di chuyển về box
+        if self.dead:
+            if not self.in_box:
+                if self.move_to_box(graph):
+                    self.in_box = True
+                    self.path = []
+            return False
+        
         if self.delay_counter < self.spawn_delay:
             self.delay_counter += 1
             return False
 
-        if self.dead and not self.in_box:
-            return False
-
-        if self.in_box and not self.dead:
-            if self.move_to_node((12, 14)):
-                self.in_box = False
+        if self.in_box and self.dead:
             self.path = []
-            return False
+            return False        
 
         if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
@@ -206,22 +234,19 @@ class Ghost:
     def move_red(self, pacman_pos, graph, player, status_set):
         ghost_pos = self.get_map_position()
 
+        # Nếu ghost đã chết và không ở trong box thì di chuyển về box
+        if self.dead:
+            if not self.in_box:
+                if self.move_to_box(graph):
+                    self.in_box = True
+                    self.path = []
+            return False
+        
         # Delay khi spawn
         if self.delay_counter < self.spawn_delay:
             self.delay_counter += 1
             return False
-
-        # Nếu ghost đã chết và không ở trong box thì không di chuyển
-        if self.dead and not self.in_box:
-            return False
-
-        # Nếu ghost đang ở trong box thì di chuyển ra ngoài box
-        if self.in_box and not self.dead:
-            if self.move_to_node((12, 14)):
-                self.in_box = False
-            self.path = []
-            return False
-
+                
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
         if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
@@ -253,7 +278,7 @@ class Ghost:
                 return True
             return False
 
-        # Nếu khô global_var.powerup: chỉ tính path mới khi path hiện tại rỗng
+        # Nếu không global_var.powerup: chỉ tính path mới khi path hiện tại rỗng
         if not self.path:
             from levels.level04 import red_ghost_path
             self.path = red_ghost_path(ghost_pos, pacman_pos, graph)
@@ -280,19 +305,16 @@ class Ghost:
 
         ghost_pos = self.get_map_position()
 
-        # Nếu ghost đang ở trạng thái bị Pacma global_var.powerup), tạm thời không di chuyển
+        # Nếu ghost đang ở trạng thái bị Pacman global_var.powerup), tạm thời không di chuyển
         if global_var.powerup:
             return False
 
-        # Nếu ghost đã chết và không ở trong box thì không di chuyển
-        if self.dead and not self.in_box:
-            return False
-
-        # Nếu ghost đang ở trong box thì di chuyển ra ngoài box
-        if self.in_box and not self.dead:
-            if self.move_to_node((12, 14)):
-                self.in_box = False
-            self.path = []
+        # Nếu ghost đã chết và không ở trong box thì di chuyển về box
+        if self.dead:
+            if not self.in_box:
+                if self.move_to_box(graph):
+                    self.in_box = True
+                    self.path = []
             return False
 
         # Nếu ghost và pacman cùng vị trí, ăn Pacman
@@ -333,15 +355,12 @@ class Ghost:
             self.path = []
             return False
 
-        # Nếu ghost đã chết và không ở trong box thì không di chuyển
-        if self.dead and not self.in_box:
-            return False
-
-        # Nếu ghost đang ở trong box thì di chuyển ra ngoài box
-        if self.in_box and not self.dead:
-            if self.move_to_node((12, 14)):
-                self.in_box = False
-            self.path = []
+        # Nếu ghost đã chết và không ở trong box thì di chuyển về box
+        if self.dead:
+            if not self.in_box:
+                if self.move_to_box(graph):
+                    self.in_box = True
+                    self.path = []
             return False
 
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
