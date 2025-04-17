@@ -1,4 +1,3 @@
-
 # Hằng số
 WIDTH = 900
 HEIGHT = 950
@@ -25,7 +24,6 @@ TEAL = (154, 203, 208)
 DARK_TEAL = (39, 68, 93)
 LIGHT_PURPLE = (254, 210, 226)
 GREY = (197, 153, 182)
-
 
 #board
 boards = [

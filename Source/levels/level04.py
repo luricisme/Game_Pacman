@@ -3,7 +3,7 @@ import tracemalloc
 import heapq
 import math
 
-def astar_search(start, goal, graph, blocked_positions=None):
+def astar_search(start, goal, graph):
     """
     Thuật toán tìm kiếm A* (A-star)
 
@@ -28,9 +28,6 @@ def astar_search(start, goal, graph, blocked_positions=None):
             - cost: Tổng chi phí của đường đi
         Hoặc None nếu không tìm thấy đường đi
     """
-    # Khởi tạo danh sách rỗng nếu không có vị trí bị chặn
-    if blocked_positions is None:
-        blocked_positions = []
 
     nodes_expanded = 0
 
@@ -87,8 +84,8 @@ def astar_search(start, goal, graph, blocked_positions=None):
 
         # Xét tất cả các nút kề với nút hiện tại
         for neighbor in graph[current]:
-            # Bỏ qua nút kề nếu đã khám phá hoặc là vị trí bị chặn
-            if neighbor in explored or neighbor in blocked_positions:
+            # Bỏ qua nút kề nếu đã khám phá
+            if neighbor in explored:
                 continue
 
             # Tính toán chi phí g_score mới khi đi từ nút hiện tại đến nút kề
@@ -177,8 +174,7 @@ def calculate_cost(current, next_node):
     # Khác với các ma khác có thể tránh khu vực nguy hiểm hoặc có chiến lược phức tạp hơn
     return base_cost
 
-
-def red_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=None):
+def red_ghost_path(ghost_pos, pacman_pos, graph):
     """
     Xác định đường đi cho Ma Đỏ theo Pac-Man sử dụng thuật toán A*
 
@@ -203,16 +199,12 @@ def red_ghost_path(ghost_pos, pacman_pos, graph, blocked_positions=None):
         list: Danh sách các vị trí trên đường đi từ Ma Đỏ đến Pac-Man
               hoặc danh sách rỗng nếu không tìm thấy đường đi hoặc đã ở vị trí Pac-Man
     """
-    # Khởi tạo danh sách rỗng nếu không có vị trí bị chặn
-    if blocked_positions is None:
-        blocked_positions = []
-
     # Kiểm tra trường hợp đặc biệt: Ma đã ở cùng vị trí với Pac-Man
     if ghost_pos == pacman_pos:
         return []  # Không cần đường đi vì đã đến đích
 
     # Thực hiện tìm kiếm A* để tìm đường đi tối ưu
-    result = astar_search(ghost_pos, pacman_pos, graph, blocked_positions)
+    result = astar_search(ghost_pos, pacman_pos, graph)
 
     # Xử lý kết quả tìm kiếm
     if result:

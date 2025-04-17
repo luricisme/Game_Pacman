@@ -1,5 +1,7 @@
 import pygame
 import sys
+import copy
+import global_var
 from ui import *
 from pacman import Pacman
 from ghost import Ghost
@@ -157,9 +159,9 @@ def main_menu():
 def run_game(level):
     # Khởi động bàn cờ
     if level == 6: # Bàn cờ đầy đủ
-        level_data = boards
+        level_data = copy.deepcopy(boards)
     else:
-        level_data = board_only_ghost
+        level_data = copy.deepcopy(board_only_ghost)
 
     ghost_speed = 2
     # Màu sắc cho từng level
@@ -194,34 +196,34 @@ def run_game(level):
     if level == 1:  
         print("---------------\nLevel 1")
         # Blue Ghost
-        ghosts.append(Ghost('blue', 428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
+        ghosts.append(Ghost('blue', 428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img))
     elif level == 2:  
         print("---------------\nLevel 2")
         # Pink Ghost
-        ghosts.append(Ghost('pink', 428, 386, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
+        ghosts.append(Ghost('pink', 428, 386, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img))
     elif level == 3:  
         print("---------------\nLevel 3")
         # Orange Ghost
-        ghosts.append(Ghost('orange', 428, 386, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
+        ghosts.append(Ghost('orange', 428, 386, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img))
     elif level == 4:  
         print("---------------\nLevel 4")
         # Red Ghost
-        ghosts.append(Ghost('red', 428, 386, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img))
+        ghosts.append(Ghost('red', 428, 386, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img))
     elif level == 5:  # All Ghosts
         print("---------------\nLevel 5")
         ghosts = [
-            Ghost('red', 478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost('pink', 428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost('blue', 428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost('orange', 378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost('red', 478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img, spawn_delay=0),
+            Ghost('pink', 428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img, spawn_delay=0),
+            Ghost('blue', 428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img, spawn_delay=0),
+            Ghost('orange', 378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img, spawn_delay=0),
         ]
     elif level == 6:  # Pacman Mode (Pacman tránh ma)
         print("---------------\nLevel 6")
         ghosts = [
-            Ghost('red', 478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost('pink', 428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost('blue', 428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
-            Ghost('orange', 378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, player.eaten_ghosts, player.powerup, spooked_img, dead_img, spawn_delay=0),
+            Ghost('red', 478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img, spawn_delay=0),
+            Ghost('pink', 428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img, spawn_delay=0),
+            Ghost('blue', 428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img, spawn_delay=0),
+            Ghost('orange', 378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data,  global_var.eaten_ghosts, spooked_img, dead_img, spawn_delay=0),
         ]
     
     def draw_board():
@@ -265,6 +267,16 @@ def run_game(level):
         screen.blit(level_text, (30, 920))
         screen.blit(menu_text, (620, 922))
 
+    def draw_misc():
+        # Hiển thị số điểm và thông tin khác
+        score_text = score_font.render(f"Score: {player.score}", True, 'white')
+        level_text = score_font.render(f"Level: {level}", True, 'white')
+        screen.blit(score_text, (30, 920))
+        screen.blit(level_text, (300, 920))
+        
+        if  global_var.powerup:
+            pygame.draw.circle(screen, 'blue', (550, 930), 15)
+
     # Game loop
     while run:
         clock.tick(FPS)
@@ -284,22 +296,23 @@ def run_game(level):
         # Hiện lên player
         player.draw(screen)
 
+        # status_matrix = [[False for _ in range(WIDTH)] for _ in range(HEIGHT)]
+        status_set = set()
         # Hiện lên ghost tương ứng với từng level
         for ghost in ghosts:
             ghost.draw()
-            other_ghost_positions = [g.get_map_position() for g in ghosts if g != ghost]
-            ghost.start_pathfinding(player.get_position(), graph, other_ghost_positions, player)
+            ghost.start_pathfinding(player.get_position(), graph, player, status_set)
 
         if level == 6:
             # print("LEVEL 06 LOGIC CODE")
-            if player.powerup and player.power_counter < 600:
+            if global_var.powerup and player.power_counter < 600:
                 player.power_counter += 1
-            elif player.powerup and player.power_counter >= 600:
+            elif  global_var.powerup and player.power_counter >= 600:
                 player.power_counter = 0
-                player.powerup = False
+                global_var.powerup = False
                 player.eaten_ghost = [False, False, False, False, False]
             
-            if player.startup_counter < 180:
+            if player.startup_counter < 50:
                 player.moving = False
                 player.startup_counter += 1
             else:
@@ -338,11 +351,12 @@ def run_game(level):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    run = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return  # Quay lại menu chính
-
-    
         pygame.display.flip()
 
     # Kết thúc game

@@ -1,12 +1,11 @@
 import pygame
-import threading
+import global_var
 from ui import *
 from levels.level01 import blue_ghost_path
 from levels.level02 import pink_ghost_path
 
 class Ghost:
-    def __init__(self, type, x_coord, y_coord, target, speed, img, direct, dead, box, id, screen, level, eaten_ghost, powerup,
-                  spooked_img, dead_img, spawn_delay=0):
+    def __init__(self, type, x_coord, y_coord, target, speed, img, direct, dead, box, id, screen, level, eaten_ghost, spooked_img, dead_img, spawn_delay=0):
         self.type = type
         self.x_pos = x_coord
         self.y_pos = y_coord
@@ -21,8 +20,6 @@ class Ghost:
         self.id = id
         self.screen = screen
         self.level = level
-        self.eaten_ghost = eaten_ghost
-        self.powerup = powerup
         self.spooked_img = spooked_img
         self.dead_img = dead_img
         self.turns, self.in_box = self.check_collisions()
@@ -30,39 +27,21 @@ class Ghost:
         self.spawn_delay = spawn_delay
         self.delay_counter = 0
         self.path = []
-        self.pathfinding_thread = None
-        self.pathfinding_lock = threading.Lock()
-        self.is_pathfinding = False
-        self.path = []
-        self.pathfinding_cooldown = 0
     
-    def start_pathfinding(self, player_pos, graph, other_ghost_positions, player):
-        if not self.is_pathfinding and (self.pathfinding_thread is None or not self.pathfinding_thread.is_alive()):
-            self.is_pathfinding = True
-            self.pathfinding_thread = threading.Thread(
-                target=self.pathfinding_worker,
-                args=(player_pos, graph, other_ghost_positions, player)
-            )
-            self.pathfinding_thread.start()
-
-    
-    def pathfinding_worker(self, player_pos, graph, other_ghost_positions, player):
-        try:
-            if self.type == 'red':
-                self.move_red(player_pos, graph, other_ghost_positions, player)
-            elif self.type == 'pink':
-                self.move_pink(player_pos, graph, other_ghost_positions, player)
-            elif self.type == 'blue':
-                self.move_blue(player_pos, graph, other_ghost_positions, player)
-            elif self.type == 'orange':
-                self.move_orange(player_pos, graph, other_ghost_positions, player)
-        finally:
-            self.is_pathfinding = False
+    def start_pathfinding(self, player_pos, graph, player, status_set):
+        if self.type == 'red':
+            self.move_red(player_pos, graph, player, status_set)
+        elif self.type == 'pink':
+            self.move_pink(player_pos, graph, player, status_set)
+        elif self.type == 'blue':
+            self.move_blue(player_pos, graph, player, status_set)
+        elif self.type == 'orange':
+            self.move_orange(player_pos, graph, player, status_set)
 
     def draw(self):
-        if (not self.powerup and not self.dead) or (self.eaten_ghost[self.id] and self.powerup and not self.dead):
+        if (not global_var.powerup and not self.dead) or (global_var.eaten_ghosts[self.id] and global_var.powerup and not self.dead):
             self.screen.blit(self.img, (self.x_pos, self.y_pos))
-        elif self.powerup and not self.dead and not self.eaten_ghost[self.id]:
+        elif global_var.powerup and not self.dead and not global_var.eaten_ghosts[self.id]:
             self.screen.blit(self.spooked_img, (self.x_pos, self.y_pos))
         else:
             self.screen.blit(self.dead_img, (self.x_pos, self.y_pos))
@@ -169,8 +148,12 @@ class Ghost:
         pass
 
     # Cải tiến: Đi hết path cũ rồi mới cập nhật lại path mới
-    def move_orange(self, pacman_pos, graph, other_ghost_positions, player):
+    def move_orange(self, pacman_pos, graph, player, status_set):
         ghost_pos = self.get_map_position()
+
+        if self.delay_counter < self.spawn_delay:
+            self.delay_counter += 1
+            return False
 
         if self.dead and not self.in_box:
             return False
@@ -181,35 +164,46 @@ class Ghost:
             self.path = []
             return False
 
-        if pacman_pos == ghost_pos and not self.powerup:
+        if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
             player.isLive = False
             self.path = []
             return False
 
-        # Nếu đang powerup
-        if self.powerup:
-            if not self.path:  # Hết đường đi thì tính lại
+        # Nếu global_var.powerup
+        if global_var.powerup:
+            # Tính toán đường đi mới khi cần (nếu hết path hoặc cooldown = 0)
+            if not self.path or self.target != pacman_pos or getattr(self, "path_update_cooldown", 0) <= 0:
                 self.target = pacman_pos
                 from levels.level03 import escape_path_for_powerup
                 self.path = escape_path_for_powerup(ghost_pos, pacman_pos, graph)
+                self.path_update_cooldown = 60  # Ví dụ: cập nhật path mỗi 60 frame
                 print("Orange ghost escaping from powered-up Pacman!")
-
+            else:
+                self.path_update_cooldown -= 1
+            return False
         else:
             if not self.path:  # Hết đường thì mới tính lại
                 self.target = pacman_pos
                 from levels.level03 import orange_ghost_path
-                self.path = orange_ghost_path(ghost_pos, pacman_pos, graph, other_ghost_positions)
+                self.path = orange_ghost_path(ghost_pos, pacman_pos, graph)
 
         # Di chuyển theo path hiện tại
         if self.path:
-            if self.move_to_node(self.path[0]):
+            next_node = self.path[0]
+
+            if next_node in status_set:
+                return False
+            
+            if self.move_to_node(next_node):
                 self.path.pop(0)
+                # ✅ Đánh dấu ô mới đã bị chiếm
+                status_set.add(next_node)
             return True
 
         return False
 
-    def move_red(self, pacman_pos, graph, other_ghost_positions, player):
+    def move_red(self, pacman_pos, graph, player, status_set):
         ghost_pos = self.get_map_position()
 
         # Delay khi spawn
@@ -229,13 +223,13 @@ class Ghost:
             return False
 
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
-        if pacman_pos == ghost_pos and not self.powerup:
+        if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
             player.isLive = False
             self.path = []
             return False
 
-        if self.powerup:
+        if global_var.powerup:
             # Tính toán đường đi mới khi cần (nếu hết path hoặc cooldown = 0)
             if not self.path or self.target != pacman_pos or getattr(self, "path_update_cooldown", 0) <= 0:
                 self.target = pacman_pos
@@ -247,25 +241,38 @@ class Ghost:
                 self.path_update_cooldown -= 1
 
             if self.path:
-                if self.move_to_node(self.path[0]):
+                next_node = self.path[0]
+
+                if next_node in status_set:
+                    return False
+                
+                if self.move_to_node(next_node):
                     self.path.pop(0)
+                    # ✅ Đánh dấu ô mới đã bị chiếm
+                    status_set.add(next_node)
                 return True
             return False
 
-        # Nếu không có powerup: chỉ tính path mới khi path hiện tại rỗng
+        # Nếu khô global_var.powerup: chỉ tính path mới khi path hiện tại rỗng
         if not self.path:
             from levels.level04 import red_ghost_path
             self.path = red_ghost_path(ghost_pos, pacman_pos, graph)
 
         if self.path:
-            if self.move_to_node(self.path[0]):
+            next_node = self.path[0]
+
+            if next_node in status_set:
+                return False
+            
+            if self.move_to_node(next_node):
                 self.path.pop(0)
+                # ✅ Đánh dấu ô mới đã bị chiếm
+                status_set.add(next_node)
             return True
 
         return False
 
-    
-    def move_blue(self, pacman_pos, graph, other_ghost_positions, player):
+    def move_blue(self, pacman_pos, graph, player, status_set):
         # Delay khi spawn
         if self.delay_counter < self.spawn_delay:
             self.delay_counter += 1
@@ -273,8 +280,8 @@ class Ghost:
 
         ghost_pos = self.get_map_position()
 
-        # Nếu ghost đang ở trạng thái bị Pacman ăn (powerup), tạm thời không di chuyển
-        if self.powerup:
+        # Nếu ghost đang ở trạng thái bị Pacma global_var.powerup), tạm thời không di chuyển
+        if global_var.powerup:
             return False
 
         # Nếu ghost đã chết và không ở trong box thì không di chuyển
@@ -289,7 +296,7 @@ class Ghost:
             return False
 
         # Nếu ghost và pacman cùng vị trí, ăn Pacman
-        if pacman_pos == ghost_pos and not self.powerup:
+        if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
             player.isLive = False
             self.path = []
@@ -297,18 +304,23 @@ class Ghost:
 
         # Tính path mới CHỈ khi path hiện tại đã đi hết
         if not self.path:
-            self.path = blue_ghost_path(ghost_pos, pacman_pos, graph, other_ghost_positions)
+            self.path = blue_ghost_path(ghost_pos, pacman_pos, graph)
 
         # Nếu không có path thì đứng yên
         if not self.path:
             return False
 
         # Di chuyển theo path hiện tại
-        if self.move_to_node(self.path[0]):
+        next_node = self.path[0]
+        if next_node in status_set:
+            return False
+        if self.move_to_node(next_node):
             self.path.pop(0)
+            # ✅ Đánh dấu ô mới đã bị chiếm
+            status_set.add(next_node)
         return True
     
-    def move_pink(self, pacman_pos, graph, other_ghost_positions, player):
+    def move_pink(self, pacman_pos, graph, player, status_set):
         # Delay khi spawn
         if self.delay_counter < self.spawn_delay:
             self.delay_counter += 1
@@ -316,8 +328,8 @@ class Ghost:
 
         ghost_pos = self.get_map_position()
 
-        # Nếu ghost đang powerup, không di chuyển và reset path
-        if self.powerup:
+        # Nếu ghost global_var.powerup, không di chuyển và reset path
+        if global_var.powerup:
             self.path = []
             return False
 
@@ -333,7 +345,7 @@ class Ghost:
             return False
 
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
-        if pacman_pos == ghost_pos and not self.powerup:
+        if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
             player.isLive = False
             self.path = []
@@ -341,13 +353,18 @@ class Ghost:
 
         # Nếu chưa có đường đi, hoặc đã đi hết đường cũ, thì tính lại path mới
         if not self.path:
-            self.path = pink_ghost_path(ghost_pos, pacman_pos, graph, other_ghost_positions)
+            self.path = pink_ghost_path(ghost_pos, pacman_pos, graph)
 
         # Nếu không tìm thấy path thì ghost sẽ không di chuyển
         if not self.path:
             return False
 
-        # Di chuyển theo đường đã tính
-        if self.move_to_node(self.path[0]):
+        # Di chuyển theo path hiện tại
+        next_node = self.path[0]
+        if next_node in status_set:
+            return False
+        if self.move_to_node(next_node):
             self.path.pop(0)
+            # ✅ Đánh dấu ô mới đã bị chiếm
+            status_set.add(next_node)
         return True
