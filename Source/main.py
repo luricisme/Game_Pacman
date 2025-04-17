@@ -217,10 +217,10 @@ def run_game(level):
     elif level == 6:  # Pacman Mode (Pacman tránh ma)
         print("---------------\nLevel 6")
         ghosts = [
-            Ghost('red', 478, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, spooked_img, dead_img, spawn_delay=0),
-            Ghost('pink', 428, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, spooked_img, dead_img, spawn_delay=0),
-            Ghost('blue', 428, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, spooked_img, dead_img, spawn_delay=0),
-            Ghost('orange', 378, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, spooked_img, dead_img, spawn_delay=0),
+            Ghost('red', 490, 436, targets[0], ghost_speed, ghost_imgs["red_ghost"], 0, False, True, 0, screen, level_data, spooked_img, dead_img, spawn_delay=120),
+            Ghost('pink', 435, 436, targets[1], ghost_speed, ghost_imgs["pink_ghost"], 0, False, True, 1, screen, level_data, spooked_img, dead_img, spawn_delay=120),
+            Ghost('blue', 435, 386, targets[2], ghost_speed, ghost_imgs["blue_ghost"], 0, False, True, 2, screen, level_data, spooked_img, dead_img, spawn_delay=120),
+            Ghost('orange', 390, 436, targets[3], ghost_speed, ghost_imgs["orange_ghost"], 0, False, True, 3, screen, level_data, spooked_img, dead_img, spawn_delay=120),
         ]
     
     def draw_board():
@@ -264,15 +264,15 @@ def run_game(level):
         screen.blit(level_text, (30, 920))
         screen.blit(menu_text, (620, 922))
 
-    def draw_misc():
-        # Hiển thị số điểm và thông tin khác
-        score_text = score_font.render(f"Score: {player.score}", True, 'white')
-        level_text = score_font.render(f"Level: {level}", True, 'white')
-        screen.blit(score_text, (30, 920))
-        screen.blit(level_text, (300, 920))
+    # def draw_misc():
+    #     # Hiển thị số điểm và thông tin khác
+    #     score_text = score_font.render(f"Score: {player.score}", True, 'white')
+    #     level_text = score_font.render(f"Level: {level}", True, 'white')
+    #     screen.blit(score_text, (30, 920))
+    #     screen.blit(level_text, (300, 920))
         
-        if  global_var.powerup:
-            pygame.draw.circle(screen, 'blue', (550, 930), 15)
+    #     if  global_var.powerup:
+    #         pygame.draw.circle(screen, 'blue', (550, 930), 15)
 
     # Game loop
     while run:
@@ -353,9 +353,9 @@ def run_game(level):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    run = False
+            # if event.type == pygame.KEYDOWN:
+            #     if event.key == pygame.K_ESCAPE:
+            #         run = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return  # Quay lại menu chính
