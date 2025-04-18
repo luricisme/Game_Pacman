@@ -193,6 +193,9 @@ class Ghost:
             self.path = []
             return False        
 
+        print("PACMAN POS: ", pacman_pos)
+        print("GHOST POS: ", ghost_pos)
+        print("POWER UP: ", global_var.powerup)
         if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
             player.isLive = False
@@ -247,6 +250,9 @@ class Ghost:
             return False
                 
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
+        print("PACMAN POS: ", pacman_pos)
+        print("GHOST POS: ", ghost_pos)
+        print("POWER UP: ", global_var.powerup)
         if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
             player.isLive = False
@@ -315,6 +321,9 @@ class Ghost:
         if global_var.powerup:
             return False
 
+        print("PACMAN POS: ", pacman_pos)
+        print("GHOST POS: ", ghost_pos)
+        print("POWER UP: ", global_var.powerup)
         # Nếu ghost và pacman cùng vị trí, ăn Pacman
         if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
@@ -361,6 +370,9 @@ class Ghost:
             self.path = []
             return False        
 
+        print("PACMAN POS: ", pacman_pos)
+        print("GHOST POS: ", ghost_pos)
+        print("POWER UP: ", global_var.powerup)
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
         if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")

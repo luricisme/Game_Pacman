@@ -48,7 +48,7 @@ def blue_ghost_path(ghost_pos, pacman_pos, graph):
         print("Memory (KB):", round(result['memory_kb'], 2))
         print("Path length:", len(result['path'])-1)
     else:
-        print(f"No path found from ghost{ghost_pos} to pacman{pacman_pos}.\n")
+        print(f"No path found from blue ghost{ghost_pos} to pacman{pacman_pos}.\n")
         return []
     return result['path'] # Exclude the ghost's current position
 

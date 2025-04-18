@@ -218,7 +218,7 @@ def red_ghost_path(ghost_pos, pacman_pos, graph):
         return result['path']
     else:
         # In thông báo nếu không tìm thấy đường đi
-        print(f"No path found from ghost{ghost_pos} to pacman{pacman_pos}.\n")
+        print(f"No path found from red ghost{ghost_pos} to pacman{pacman_pos}.\n")
         return []
 
 def escape_path_for_powerup(ghost_pos, pacman_pos, graph):

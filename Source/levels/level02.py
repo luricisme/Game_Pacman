@@ -50,6 +50,6 @@ def pink_ghost_path(ghost_pos, pacman_pos, graph):
         print("Memory (KB):", round(result['memory_kb'], 4))
         print("Path length:", len(result['path'])-1)
     else:
-        print(f"No path found from ghost{ghost_pos} to pacman{pacman_pos}.\n")
+        print(f"No path found from pink ghost{ghost_pos} to pacman{pacman_pos}.\n")
         return []
     return result['path'] 
