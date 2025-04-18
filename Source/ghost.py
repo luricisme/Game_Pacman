@@ -172,6 +172,7 @@ class Ghost:
                     self.speed = 2          # Đặt lại tốc độ về bình thường
                     return True
         return False
+
     # Cải tiến: Đi hết path cũ rồi mới cập nhật lại path mới
     def move_orange(self, pacman_pos, graph, player, status_set):
         ghost_pos = self.get_map_position()
@@ -205,7 +206,7 @@ class Ghost:
                 from levels.level03 import escape_path_for_powerup
                 self.path = escape_path_for_powerup(ghost_pos, pacman_pos, graph)
                 self.path_update_cooldown = 60  # Ví dụ: cập nhật path mỗi 60 frame
-                print("Orange ghost escaping from powered-up Pacman!")
+                # print("Orange ghost escaping from powered-up Pacman!")
             else:
                 self.path_update_cooldown -= 1
             return False
@@ -258,7 +259,7 @@ class Ghost:
                 from levels.level04 import escape_path_for_powerup
                 self.path = escape_path_for_powerup(ghost_pos, pacman_pos, graph)
                 self.path_update_cooldown = 60  # Ví dụ: cập nhật path mỗi 60 frame
-                print("Red ghost escaping from powered-up Pacman!")
+                # print("Red ghost escaping from powered-up Pacman!")
             else:
                 self.path_update_cooldown -= 1
 
