@@ -8,8 +8,8 @@ PI = math.pi
 class Pacman:
     def __init__(self, x, y):
         self.images = [pygame.transform.scale(pygame.image.load(f'./assets/pacman/{i}.png'), (40, 40)) for i in range(1, 5)]
-        self.x = y*TILE_WIDTH - TILE_WIDTH//4
-        self.y = x*TILE_HEIGHT - TILE_HEIGHT//4
+        self.x = y*TILE_WIDTH - TILE_WIDTH*0.3
+        self.y = x*TILE_HEIGHT - TILE_HEIGHT*0.3
 
         self.isLive = True
         self.direction = 0
@@ -49,17 +49,17 @@ class Pacman:
             self.y += self.speed
     
     def get_position(self):
-        return ((self.y +TILE_HEIGHT//4)//TILE_HEIGHT, (self.x + TILE_WIDTH//4)//TILE_WIDTH)
+        return ((self.y + TILE_HEIGHT*0.3)//TILE_HEIGHT, (self.x + TILE_WIDTH*0.3)//TILE_WIDTH)
 
     def check_position(self, level):
         turns = [False, False, False, False]
         num1 = TILE_HEIGHT
         num2 = TILE_WIDTH
         num3 = 13
-        centerx = self.x + 20
-        centery = self.y + 20
+        centerx = int(self.x + 20)
+        centery = int(self.y + 20)
 
-        if centerx // 30 < 29:
+        if centerx // 30 <= 29:
             if self.direction == 0:
                 if level[centery // num1][(centerx - num3) // num2] < 3:
                     turns[1] = True
@@ -74,23 +74,23 @@ class Pacman:
                     turns[2] = True
 
             if self.direction in [2, 3]:
-                if 10 <= centerx % num2 <= 18:
+                if 11 <= centerx % num2 <= 14:
                     if level[(centery + num3) // num1][centerx // num2] < 3:
                         turns[3] = True
                     if level[(centery - num3) // num1][centerx // num2] < 3:
                         turns[2] = True
-                if 10 <= centery % num1 <= 18:
+                if 11 <= centery % num1 <= 14:
                     if level[centery // num1][(centerx - num2) // num2] < 3:
                         turns[1] = True
                     if level[centery // num1][(centerx + num2) // num2] < 3:
                         turns[0] = True
             if self.direction in [0, 1]:
-                if 10 <= centerx % num2 <= 18:
+                if 11 <= centerx % num2 <= 14:
                     if level[(centery + num1) // num1][centerx // num2] < 3:
                         turns[3] = True
                     if level[(centery - num1) // num1][centerx // num2] < 3:
                         turns[2] = True
-                if 10 <= centery % num1 <= 18:
+                if 11 <= centery % num1 <= 14:
                     if level[centery // num1][(centerx - num3) // num2] < 3:
                         turns[1] = True
                     if level[centery // num1][(centerx + num3) // num2] < 3:
@@ -108,8 +108,8 @@ class Pacman:
         center_y = self.y + 20
 
         if 0 < center_x < 770:
-            row = center_y // num1
-            col = center_x // num2
+            row = int(center_y // num1)
+            col = int(center_x // num2)
             if level[row][col] == 1:
                 level[row][col] = 0
                 self.score += 10

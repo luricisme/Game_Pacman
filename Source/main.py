@@ -179,12 +179,13 @@ def run_game(level):
     # player = None
     
     # Target mặc định là vị trí bắt đầu của pacman
-    #player = Pacman(2, 5)
+    #player = Pacman(2, 7)
     #player = Pacman(30, 22)
     #player = Pacman(20, 22)
     player = Pacman(27, 12)
     #player = Pacman(2, 27) 
     run = True
+    player = Pacman(27, 12)
     
     # Mảng chứa ghosts
     ghosts = [] 
