@@ -16,8 +16,8 @@ pygame.display.set_caption("Pac-Man")
 clock = pygame.time.Clock()
 
 # Font chữ
-title_font = pygame.font.Font('freesansbold.ttf', 70)
-title_font_sm = pygame.font.Font('freesansbold.ttf', 50)
+title_font = pygame.font.Font('freesansbold.ttf', 65)
+title_font_sm = pygame.font.Font('freesansbold.ttf', 45)
 menu_font = pygame.font.Font('freesansbold.ttf', 30)
 instruction_font = pygame.font.Font('freesansbold.ttf', 35)
 score_font = pygame.font.Font('freesansbold.ttf', 25)
@@ -88,30 +88,30 @@ def main_menu():
     """Màn hình menu chính"""
     while True:
         screen.fill(DARK_PURPLE)
-        draw_diamonds_changecolor(screen, 590, 255, 4)
-        draw_diamonds_fadeout(screen, 300, 230, 5)
-        draw_diamonds_changecolor(screen, 100, 200, 10)
-        draw_diamonds_changecolor(screen, 770, 40, 11)
-        draw_diamonds_changecolor(screen, 140, 450, 7)
-        draw_diamonds_changecolor(screen, 100, 200, 10)
-        draw_diamonds_fadeout(screen, 830, 150, 6)
-        draw_diamonds_changecolor(screen, 750, 820, 10)
-        draw_diamonds_fadeout(screen, 50, 80, 5)
-        draw_diamonds_changecolor(screen, 100, 850, 11)
-        draw_diamonds_fadeout(screen, 290, 890, 4)
-        draw_diamonds_fadeout(screen, 850, 900, 7)
-        draw_diamonds_changecolor(screen, 855, 500, 9)
-        draw_diamonds_fadeout(screen, 720, 600, 4)
-        draw_diamonds_fadeout(screen, 180, 710, 4)
+        draw_diamonds_changecolor(screen, 520, 230, 3)
+        draw_diamonds_fadeout(screen, 270, 210, 5)
+        draw_diamonds_changecolor(screen, 80, 180, 10)
+        draw_diamonds_changecolor(screen, 660, 40, 9)
+        draw_diamonds_changecolor(screen, 120, 400, 7)
+        draw_diamonds_changecolor(screen, 80, 180, 9)
+        draw_diamonds_fadeout(screen, 700, 150, 6)
+        draw_diamonds_changecolor(screen, 650, 730, 9)
+        draw_diamonds_fadeout(screen, 40, 70, 5)
+        draw_diamonds_changecolor(screen, 85, 770, 10)
+        draw_diamonds_fadeout(screen, 250, 800, 4)
+        draw_diamonds_fadeout(screen, 700, 810, 6)
+        draw_diamonds_changecolor(screen, 710, 450, 8)
+        draw_diamonds_fadeout(screen, 620, 540, 3)
+        draw_diamonds_fadeout(screen, 135, 650, 4)
         
         # Vẽ tiêu đề
-        draw_text('PACMAN GAME', title_font, PURPLE, screen, WIDTH//2, 100)
-        draw_text('GROUP 3', title_font_sm, LIGHT_PURPLE, screen, WIDTH//2, 190)
+        draw_text('PACMAN GAME', title_font, PURPLE, screen, WIDTH//2, 85)
+        draw_text('GROUP 3', title_font_sm, LIGHT_PURPLE, screen, WIDTH//2, 155)
         
         # Vẽ các lựa chọn level
         level_buttons = []
-        base_y = 250
-        gap = 85
+        base_y = 235
+        gap = 72
         
         colors = [
             (BLUE, DARK_BLUE, 'Level 1 - Blue Ghost'),
@@ -124,15 +124,15 @@ def main_menu():
         
         for idx, (bg_color, text_color, label) in enumerate(colors):
             y_pos = base_y + idx * gap
-            width = 450 if idx in [2, 5] else 400
-            pygame.draw.rect(screen, bg_color, [WIDTH//2 - width // 2, y_pos, width, 55], 0, 10)
-            draw_text(label, menu_font, text_color, screen, WIDTH//2, y_pos + 30)
-            level_buttons.append(pygame.Rect(WIDTH//2 - 200, y_pos, 400, 55))  # Button hitbox
+            width = 400 if idx in [2, 5] else 360
+            pygame.draw.rect(screen, bg_color, [WIDTH//2 - width // 2, y_pos, width, 50], 0, 10)
+            draw_text(label, menu_font, text_color, screen, WIDTH//2, y_pos + 25)
+            level_buttons.append(pygame.Rect(WIDTH//2 - 180, y_pos, 360, 50))  # Button hitbox
 
         # Vẽ nút Exit
-        exit_button_rect = pygame.Rect(WIDTH//2 - 75, base_y + 6 * gap + 30, 150, 50)
+        exit_button_rect = pygame.Rect(WIDTH//2 - 65, base_y + 6 * gap + 35, 130, 45)
         pygame.draw.rect(screen, GREY, exit_button_rect, 0, 10)
-        draw_text('Exit', menu_font, DARK_PURPLE, screen, WIDTH//2, base_y + 6 * gap + 55)
+        draw_text('Exit', menu_font, DARK_PURPLE, screen, WIDTH//2, base_y + 6 * gap + 57)
         
         # Xử lý sự kiện
         for event in pygame.event.get():
@@ -153,6 +153,7 @@ def main_menu():
 
         pygame.display.flip()
         clock.tick(FPS)
+
 
 def run_game(level):
     # Khởi động bàn cờ
@@ -179,13 +180,12 @@ def run_game(level):
     # player = None
     
     # Target mặc định là vị trí bắt đầu của pacman
-    #player = Pacman(2, 7)
-    #player = Pacman(30, 22)
-    #player = Pacman(20, 22)
-    player = Pacman(27, 12)
-    #player = Pacman(2, 27) 
+    # player = Pacman(2, 6)
+    # player = Pacman(30, 22)
+    # player = Pacman(20, 22)
+    # player = Pacman(27, 12)
+    player = Pacman(2, 27)
     run = True
-    player = Pacman(27, 12)
     
     # Mảng chứa ghosts
     ghosts = [] 
@@ -283,15 +283,14 @@ def run_game(level):
         back_menu()
         
         # Hiện lên player
-         # Hiện lên player
         player.draw(screen)
         player_rect = pygame.Rect(player.x, player.y, 40, 40)
-        player_rect = pygame.Rect(player.x, player.y, 40, 40)
+        # player_rect = pygame.Rect(player.x, player.y, 40, 40)
         status_set = set()
         # Hiện lên ghost tương ứng với từng level
         for ghost in ghosts:
             ghost.rect = ghost.draw()
-            ghost.rect = ghost.draw()
+            # ghost.rect = ghost.draw()
             ghost.start_pathfinding(player.get_position(), graph, player, status_set)
           
             if global_var.powerup and player_rect.colliderect(ghost.rect) and not ghost.dead and not player.eaten_ghosts[ghost.id]:
@@ -305,7 +304,7 @@ def run_game(level):
             # print("LEVEL 06 LOGIC CODE")
             if global_var.powerup and player.power_counter < 200:
                 player.power_counter += 1
-            elif  global_var.powerup and player.power_counter >= 200:
+            elif global_var.powerup and player.power_counter >= 200:
                 player.power_counter = 0
                 global_var.powerup = False
                 player.eaten_ghost = [False, False, False, False, False]
@@ -318,7 +317,7 @@ def run_game(level):
 
             player.turns_allowed = player.check_position(level_data)
             if player.moving:
-                player.move()
+                player.move()                                                                                                                                                       
             player.check_collisions(level_data)
             draw_misc()
 
@@ -327,7 +326,7 @@ def run_game(level):
                 player.direction_command = 0
             elif key_press[pygame.K_LEFT]:
                 player.direction_command = 1
-            if key_press[pygame.K_UP]:
+            if key_press[pygame.K_UP]:                                                                                                                                          
                 player.direction_command = 2
             elif key_press[pygame.K_DOWN]:
                 player.direction_command = 3
