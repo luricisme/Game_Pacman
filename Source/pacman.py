@@ -49,7 +49,7 @@ class Pacman:
             self.y += self.speed
     
     def get_position(self):
-        return ((self.y + TILE_HEIGHT*0.3)//TILE_HEIGHT, (self.x + TILE_WIDTH*0.3)//TILE_WIDTH)
+        return (int(self.y + TILE_HEIGHT*0.3+1)//TILE_HEIGHT, int(self.x + TILE_WIDTH*0.3 + 1)//TILE_WIDTH)
 
     def check_position(self, level):
         turns = [False, False, False, False]

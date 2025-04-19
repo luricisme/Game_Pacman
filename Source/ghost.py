@@ -49,7 +49,7 @@ class Ghost:
         return ghost_rect
     
     def get_map_position(self):
-        return ((self.y_pos+TILE_HEIGHT*0.3)//TILE_HEIGHT, (self.x_pos+TILE_WIDTH*0.3)//TILE_WIDTH)
+        return (int(self.y_pos + TILE_HEIGHT*0.3+1)//TILE_HEIGHT, int(self.x_pos + TILE_WIDTH*0.3 + 1)//TILE_WIDTH)
 
     def check_collisions(self):
         num1 = ((HEIGHT - 50) // 33)
