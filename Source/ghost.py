@@ -7,10 +7,10 @@ from levels.level02 import *
 class Ghost:
     def __init__(self, type, x, y, speed, img, direct, dead, box, id, screen, level, spooked_img, dead_img, spawn_delay=0):
         self.type = type
-        self.x_pos = y * TILE_WIDTH - TILE_WIDTH // 4
-        self.y_pos = x * TILE_HEIGHT - TILE_HEIGHT // 4
-        self.center_x = self.x_pos + 22
-        self.center_y = self.y_pos + 22
+        self.x_pos = y * TILE_WIDTH - TILE_WIDTH *0.3
+        self.y_pos = x * TILE_HEIGHT - TILE_HEIGHT *0.3
+        self.center_x = int(self.x_pos + 22)
+        self.center_y = int(self.y_pos + 22)
         self.speed = speed
         self.img = img
         self.direction = direct
@@ -49,16 +49,16 @@ class Ghost:
         return ghost_rect
     
     def get_map_position(self):
-        return ((self.y_pos+TILE_HEIGHT//4)//TILE_HEIGHT, (self.x_pos+TILE_WIDTH//4)//TILE_WIDTH)
+        return (int(self.y_pos + TILE_HEIGHT*0.3+1)//TILE_HEIGHT, int(self.x_pos + TILE_WIDTH*0.3 + 1)//TILE_WIDTH)
 
     def check_collisions(self):
-        num1 = ((HEIGHT - 50) // 32)
+        num1 = ((HEIGHT - 50) // 33)
         num2 = (WIDTH // 30)
-        num3 = 15
+        num3 = 13
         self.turns = [False, False, False, False]
         level = self.level
 
-        if 0 < self.center_x // 30 < 29:
+        if 0 < self.center_x // 30 <= 29:
             if level[(self.center_y - num3) // num1][self.center_x // num2] == 9:
                 self.turns[2] = True
             if level[self.center_y // num1][(self.center_x - num3) // num2] < 3 or (
@@ -123,8 +123,8 @@ class Ghost:
         return self.turns, self.in_box
 
     def move_to_node(self, node):        
-        node_x = node[1] * TILE_WIDTH - TILE_WIDTH // 4
-        node_y = node[0] * TILE_HEIGHT - TILE_HEIGHT // 4
+        node_x = node[1] * TILE_WIDTH - TILE_WIDTH *0.3
+        node_y = node[0] * TILE_HEIGHT - TILE_HEIGHT *0.3
         # Di chuyển ghost đến vị trí của node
         if self.x_pos < node_x:            
             self.x_pos += self.speed
@@ -192,10 +192,7 @@ class Ghost:
         if self.in_box and self.dead:
             self.path = []
             return False        
-
-        print("PACMAN POS: ", pacman_pos)
-        print("GHOST POS: ", ghost_pos)
-        print("POWER UP: ", global_var.powerup)
+        
         if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
             player.isLive = False
@@ -227,7 +224,6 @@ class Ghost:
             
             if self.move_to_node(next_node):
                 self.path.pop(0)
-                # ✅ Đánh dấu ô mới đã bị chiếm
                 status_set.add(next_node)
             return True
 
@@ -249,10 +245,6 @@ class Ghost:
             self.delay_counter += 1
             return False
                 
-        # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
-        print("PACMAN POS: ", pacman_pos)
-        print("GHOST POS: ", ghost_pos)
-        print("POWER UP: ", global_var.powerup)
         if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
             player.isLive = False
@@ -277,7 +269,6 @@ class Ghost:
                 
                 if self.move_to_node(next_node):
                     self.path.pop(0)
-                    # ✅ Đánh dấu ô mới đã bị chiếm
                     status_set.add(next_node)
                 return True
             return False
@@ -295,7 +286,6 @@ class Ghost:
             
             if self.move_to_node(next_node):
                 self.path.pop(0)
-                # ✅ Đánh dấu ô mới đã bị chiếm
                 status_set.add(next_node)
             return True
 
@@ -321,9 +311,6 @@ class Ghost:
         if global_var.powerup:
             return False
 
-        print("PACMAN POS: ", pacman_pos)
-        print("GHOST POS: ", ghost_pos)
-        print("POWER UP: ", global_var.powerup)
         # Nếu ghost và pacman cùng vị trí, ăn Pacman
         if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
@@ -345,7 +332,6 @@ class Ghost:
             return False
         if self.move_to_node(next_node):
             self.path.pop(0)
-            # ✅ Đánh dấu ô mới đã bị chiếm
             status_set.add(next_node)
         return True
     
@@ -370,9 +356,6 @@ class Ghost:
             self.path = []
             return False        
 
-        print("PACMAN POS: ", pacman_pos)
-        print("GHOST POS: ", ghost_pos)
-        print("POWER UP: ", global_var.powerup)
         # Nếu ghost ăn pacman thì ghost sẽ không di chuyển
         if pacman_pos == ghost_pos and not global_var.powerup:
             print("Pacman eaten")
@@ -394,6 +377,5 @@ class Ghost:
             return False
         if self.move_to_node(next_node):
             self.path.pop(0)
-            # ✅ Đánh dấu ô mới đã bị chiếm
             status_set.add(next_node)
         return True

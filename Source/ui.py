@@ -1,9 +1,9 @@
 # Hằng số
 WIDTH = 750
-HEIGHT = 850
+HEIGHT = 875
 FPS = 60
 TILE_WIDTH = (WIDTH // 30)
-TILE_HEIGHT = ((HEIGHT - 50) // 32)
+TILE_HEIGHT = ((HEIGHT - 50) // 33)
 # Màu sắc
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
